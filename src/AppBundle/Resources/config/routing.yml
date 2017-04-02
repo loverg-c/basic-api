@@ -1,0 +1,7 @@
+auth:
+    type:        rest
+    resource:    AppBundle\Controller\AuthController
+
+users:
+    type:        rest
+    resource:    AppBundle\Controller\UserController
