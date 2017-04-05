@@ -9,24 +9,32 @@ A basic api with symfony 3.2, lexik jwt, nelmio, jms, fosrest
 
 ## Setup
 
+#### Installation
 ```
 $> composer install
+```
+
+#### Database config
+```
 $> php bin/console doctrine:database:create --if-not-exists
 $> php bin/console doctrine:schema:update --force
 $> php bin/console doctrine:fixtures:load
+```
+
+#### Keys generation
+```
 $> mkdir -p var/jwt # For Symfony3+, no need of the -p option
 $> openssl genrsa -out var/jwt/private.pem -aes256 4096
 $> openssl rsa -pubout -in var/jwt/private.pem -out var/jwt/public.pem
-$> php bin/console server:run
 
 ```
 
-### Run
+#### Run
 
 `$> php bin/console server:run`
 
 
-### Routes
+#### Routes
 
 `$> ./bin/console route:debug`
 
