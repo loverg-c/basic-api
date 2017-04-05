@@ -43,6 +43,16 @@ $> openssl rsa -pubout -in var/jwt/private.pem -out var/jwt/public.pem
 The documentation is generated using the [NelmioApiDocBundle](https://github.com/nelmio/NelmioApiDocBundle).
 Access the documentation at http://localhost:8000/api/doc
 
+## Connecting a client
+
+Note that you should use the x-www-form-urlencoded format for your request
+
+You can connect to the api by POST on http://localhost:8000/api/auth the parameters are : [username => your_login, password => your_password]
+(two based user are already in database in ORM fixtures, with ileo-admin and ileo-user and the basic password of ileotech)
+
+For further details, read the documentation about [JsonWebToken](https://jwt.io/introduction/).
+
+Read your api doc to learn what you can do with the API
 
 ## References
 
