@@ -1,14 +1,13 @@
-.checkout
-=========
-
 A Symfony project created on April 2, 2017, 4:00 pm.
 
-### Prerequisites
+A basic api with symfony 3.2, lexik jwt, nelmio, jms, fosrest 
+
+## Prerequisites
 
 - composer
 - openssl
 
-### Setup
+## Setup
 
 ```
 $> composer install
@@ -27,7 +26,7 @@ $> php bin/console server:run
 `$> php bin/console server:run`
 
 
-#### Routes
+### Routes
 
 `$> ./bin/console route:debug`
 
