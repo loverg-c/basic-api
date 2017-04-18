@@ -61,3 +61,4 @@ Read your api doc to learn what you can do with the API
 * [NelmioApiDocBundle](https://github.com/nelmio/NelmioApiDocBundle)
 * [JMSSerializerBundle](http://jmsyst.com/bundles/JMSSerializerBundle)
 * [LexikJWTAuthenticationBundle](https://github.com/lexik/LexikJWTAuthenticationBundle)
+* [NelmioCorsBundle](https://github.com/nelmio/NelmioCorsBundle)
