@@ -50,6 +50,9 @@ abstract class TestCase extends WebTestCase
     }
 
     /**
+     *
+     * 200 OK
+     *
      * @param array $params
      * @param array|null $data
      * @param array|null $expected
@@ -70,6 +73,9 @@ abstract class TestCase extends WebTestCase
     }
 
     /**
+     *
+     * 204 No Content
+     *
      * @param array $params
      * @param array|null $data
      * @param array|null $expected
@@ -93,6 +99,9 @@ abstract class TestCase extends WebTestCase
     }
 
     /**
+     *
+     * 400 Bad Request
+     *
      * @param array $params
      * @param array|null $data
      * @param array $expected
@@ -121,6 +130,9 @@ abstract class TestCase extends WebTestCase
     }
 
     /**
+     *
+     * 401 Unauthorized
+     *
      * @param array $params
      * @param array|null $data
      * @param array $expected
@@ -153,6 +165,9 @@ abstract class TestCase extends WebTestCase
     }
 
     /**
+     *
+     * 403 Forbidden
+     *
      * @param array $params
      * @param array|null $data
      * @param array $expected
@@ -179,6 +194,9 @@ abstract class TestCase extends WebTestCase
     }
 
     /**
+     *
+     * 404 Not Found
+     *
      * @param array $params
      * @param array|null $data
      * @param array $expected
@@ -226,6 +244,9 @@ abstract class TestCase extends WebTestCase
     }
 
     /**
+     *
+     * 422 Unprocessable entity
+     *
      * @param array $params
      * @param array|null $data
      * @param array $expected
@@ -252,5 +273,6 @@ abstract class TestCase extends WebTestCase
 
         return $http["decoded"];
     }
+
 }
 
