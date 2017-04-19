@@ -273,9 +273,89 @@ class UserControllerTest extends TestCase
     }
 
 
+
+
+    /**
+     * Get list of users: GET /users
+     * Tests:
+     * - 200: successful
+     * - 401: token not provided
+     * - 403: forbidden
+     * - 404: token provided but invalid
+     */
+
+    /**
+     * @group getUserList
+     */
+    public function testGetUserList_401_tokenNotProvided()
+    {
+        $this->httpRequest401(["method" => "GET", "path" => '/api'.$this->endpoint]);
+    }
+
+    /**
+     * @group getUserList
+     */
+    public function testGetUserList_403_forbidden()
+    {
+        $this->httpRequest403(
+            [
+                "method" => "GET",
+                "path" => '/api'.$this->endpoint,
+                "token" => $this->user["token"],
+            ],
+            null
+        );
+    }
+
+    /**
+     * @group getUserList
+     */
+    public function testGetUserList_404_invalidToken()
+    {
+        $this->httpRequest404(
+            [
+                "method" => "GET",
+                "path" => '/api'.$this->endpoint,
+                "token" => substr($this->admin["token"], 0, -1),
+            ],
+            null,
+            ["code" => 404, "message" => "Not Found", "exception_message" => "User cannot be found."]
+        );
+    }
+
+
+    /**
+     * @group getUserList
+     */
+    public function testGetUserList_200_successful()
+    {
+
+        $this->httpRequest200(
+            [
+                "method" => "GET",
+                "path" => '/api'.$this->endpoint,
+                "token" => $this->admin["token"],
+            ],
+            null,
+            [
+                [
+                    "email" => "admin@ileotech.com",
+                    "username" => "ileo-admin",
+                    "role" => "ROLE_SUPER_ADMIN",
+                ],
+                [
+                    "email" => "user@ileotech.com",
+                    "username" => "ileo-user",
+                    "role" => "ROLE_USER",
+                ],
+            ]
+        );
+    }
+
+
+
     //todo PUT
     //todo PATCH
     //todo DELETE
-    //todo GET LIST
 
 }
