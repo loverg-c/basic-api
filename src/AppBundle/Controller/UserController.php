@@ -31,6 +31,8 @@ class UserController extends FOSRestController
      *
      * @Get("/users/{id}")
      *
+     * @Security("is_granted('IS_AUTHENTICATED_FULLY')")
+     *
      * @ApiDoc(
      *  resource = "User",
      *  description = "Return a user by id",
@@ -109,7 +111,7 @@ class UserController extends FOSRestController
     {
         $user = $this->getDoctrine()->getRepository("AppBundle:User")->findOneBy(["email" => $email]);
         if (!$user) {
-            throw new HttpException(404, "This email does not exist.");
+            throw new HttpException(404, "User cannot be found.");
         }
         $user->eraseSensitive();
 
@@ -409,7 +411,9 @@ class UserController extends FOSRestController
         $em->remove($user);
         $em->flush();
 
-        return $this->handleView(View::create()->setData('Delete has been done, you will never see it again')->setStatusCode(200));
+        return $this->handleView(
+            View::create()->setData('Delete has been done, you will never see it again')->setStatusCode(200)
+        );
     }
 
     //todo : ROLE management

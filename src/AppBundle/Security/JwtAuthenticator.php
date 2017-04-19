@@ -4,6 +4,7 @@ namespace AppBundle\Security;
 
 use Doctrine\ORM\EntityManager;
 use Lexik\Bundle\JWTAuthenticationBundle\Encoder\DefaultEncoder as JWTEncoder;
+use Lexik\Bundle\JWTAuthenticationBundle\Exception\JWTDecodeFailureException;
 use Lexik\Bundle\JWTAuthenticationBundle\TokenExtractor\AuthorizationHeaderTokenExtractor;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -61,12 +62,12 @@ class JwtAuthenticator extends AbstractGuardAuthenticator
     {
 
         if (!$request->headers->has("Authorization")) {
-            return NULL;
+            return null;
         }
         $extractor = new AuthorizationHeaderTokenExtractor("Bearer", "Authorization");
         $token = $extractor->extract($request);
         if (!$token) {
-            return NULL;
+            return null;
         }
 
         return $token;
@@ -80,13 +81,14 @@ class JwtAuthenticator extends AbstractGuardAuthenticator
     public function getUser($credentials, UserProviderInterface $userProvider)
     {
 
-        $data = $this->jwtEncoder->decode($credentials);
-        if (!$data){
-            return NULL;
+        try {
+            $data = $this->jwtEncoder->decode($credentials);
+        } catch (JWTDecodeFailureException $e) {
+            return null;
         }
         $user = $this->em->getRepository("AppBundle:User")->findOneBy(["username" => $data["username"]]);
-        if (!$user){
-            return NULL;
+        if (!$user) {
+            return null;
         }
 
         return $user;
@@ -105,19 +107,10 @@ class JwtAuthenticator extends AbstractGuardAuthenticator
     /**
      * @param Request $request
      * @param AuthenticationException $exception
-     * @return JsonResponse
      */
     public function onAuthenticationFailure(Request $request, AuthenticationException $exception)
     {
-        return new JsonResponse(array(
-            "error" => array(
-                "code" => "404",
-                "message" => "Not Found",
-                "exception" => [
-                    "message" => "User cannot be found."
-                ]
-            )
-        ));
+        throw new HttpException(404, "User cannot be found.");
     }
 
     /**
