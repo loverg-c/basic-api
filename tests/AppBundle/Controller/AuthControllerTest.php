@@ -25,7 +25,7 @@ class AuthControllerTest extends TestCase
      */
     private $work_data = [
         "username" => "ileo-admin",
-        "password" => "d1zqvdzz",
+        "password" => "admin",
     ];
 
     /**
