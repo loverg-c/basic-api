@@ -352,15 +352,6 @@ class UserControllerTest extends TestCase
         );
     }
 
-
-
-
-
-    //todo PUT
-    //todo PATCH
-    //todo DELETE
-
-
     /**
      * Delete a user : DELETE /users/:user_id
      * Tests:
@@ -445,5 +436,8 @@ class UserControllerTest extends TestCase
             ]
         );
     }
+
+    //todo PUT
+    //todo PATCH
 
 }
