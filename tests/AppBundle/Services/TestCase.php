@@ -62,11 +62,15 @@ abstract class TestCase extends WebTestCase
         $http = $this->request($params, $data);
 
 //         if ($http["response"]->getStatusCode() != 200)
-        // var_dump($http["decoded"]);
+        //  var_dump($http["decoded"]);
 
         $this->assertEquals(200, $http["response"]->getStatusCode());
         if ($expected) {
-            $this->assertArraySubset($expected, $http["decoded"]);
+            if (is_array($http["decoded"])) {
+                $this->assertArraySubset($expected, $http["decoded"]);
+            } else {
+                $this->assertEquals($expected['exception_message'], $http["decoded"]);
+            }
         }
 
         return $http["decoded"];

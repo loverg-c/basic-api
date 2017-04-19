@@ -354,8 +354,96 @@ class UserControllerTest extends TestCase
 
 
 
+
+
     //todo PUT
     //todo PATCH
     //todo DELETE
+
+
+    /**
+     * Delete a user : DELETE /users/:user_id
+     * Tests:
+     * - 200: successful
+     * - 401: token not provided
+     * - 403: forbidden request when the token belongs to a user with no proper right to perform the request
+     * - 404: token provided but invalid
+     * - 404: user cannot be found
+     */
+
+    /**
+     * @group deleteUser
+     */
+    public function testDeleteUser_401_tokenNotProvided()
+    {
+        $this->httpRequest401(array("method" => "DELETE", "path" => '/api'.$this->endpoint."/".$this->user["id"]));
+    }
+
+    /**
+     * @group deleteUser
+     */
+    public function testDeleteUser_403_forbidden()
+    {
+        $this->httpRequest403(
+            [
+                "method" => "DELETE",
+                "path" => '/api'.$this->endpoint."/".$this->user["id"],
+                "token" => $this->user["token"],
+            ],
+            null,
+            ["code" => 403, "message" => "Forbidden"]
+        );
+    }
+
+    /**
+     * @group deleteUser
+     */
+    public function testDeleteUser_404_invalidToken()
+    {
+        $this->httpRequest404(
+            [
+                "method" => "DELETE",
+                "path" => '/api'.$this->endpoint."/".$this->user["id"],
+                "token" => substr($this->admin["token"], 0, -1),
+            ],
+            null,
+            [
+                "code" => 404,
+                "message" => "Not Found",
+                "exception_message" => "User cannot be found.",
+
+            ]
+        );
+    }
+
+    /**
+     * @group deleteUser
+     */
+    public function testDeleteUser_404_onUser()
+    {
+        $this->httpRequest404(
+            ["method" => "DELETE", "path" => '/api'.$this->endpoint."/0", "token" => $this->admin["token"]],
+            null,
+            ["code" => 404, "message" => "Not Found", "exception_message" => "User cannot be found."]
+        );
+    }
+
+    /**
+     * @group deleteUser
+     */
+    public function testDeleteUser_200_successful()
+    {
+        $this->httpRequest200(
+            array(
+                "method" => "DELETE",
+                "path" => '/api'.$this->endpoint."/".$this->user["id"],
+                "token" => $this->admin["token"],
+            ),
+            null,
+            [
+                "exception_message" => "Delete has been done, you will never see it again"
+            ]
+        );
+    }
 
 }
