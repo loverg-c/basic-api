@@ -42,6 +42,13 @@ $> openssl rsa -pubout -in var/jwt/private.pem -out var/jwt/public.pem
 
 Unit test are running with phpunit, you can find a php7 executable of phpunit in bin/
 
+#### Database config for test env
+```
+$> php bin/console doctrine:database:create --env=test --if-not-exists
+$> php bin/console doctrine:schema:update --force --env=test
+$> php bin/console doctrine:fixtures:load --env=test
+```
+
 `$> php bin/phpunit`
 
 ## API DOC
