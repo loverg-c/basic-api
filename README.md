@@ -40,7 +40,7 @@ $> openssl rsa -pubout -in var/jwt/private.pem -out var/jwt/public.pem
 
 ## Test
 
-Unit test are running with phpunit, you can find a php7 executable of phpunit bin/
+Unit test are running with phpunit, you can find a php7 executable of phpunit in bin/
 
 `$> php bin/phpunit`
 
@@ -50,8 +50,6 @@ The documentation is generated using the [NelmioApiDocBundle](https://github.com
 Access the documentation at http://localhost:8000/api/doc
 
 ## Connecting a client
-
-Note that you should use the x-www-form-urlencoded format for your request
 
 You can connect to the api by POST on http://localhost:8000/api/auth the parameters are : [username => your_login, password => your_password]
 (two based user are already in database in ORM fixtures, with username:ileo-admin password:admin and username:ileo-user password:user)
