@@ -1,6 +1,7 @@
 A Symfony project created on April 2, 2017, 4:00 pm.
 
-A basic api with symfony 3.2, lexik jwt, nelmio, jms, fosrest 
+A basic api with symfony 3.2, lexik jwt, nelmio, jms, fosrest
+This API allow you to connect and manage user
 
 ## Prerequisites
 
@@ -27,6 +28,28 @@ $> php bin/console doctrine:fixtures:load
 $> mkdir -p var/jwt # For Symfony3+, no need of the -p option
 $> openssl genrsa -out var/jwt/private.pem -aes256 4096
 $> openssl rsa -pubout -in var/jwt/private.pem -out var/jwt/public.pem
+
+```
+
+#### Config files
+parameter.yml
+```
+parameters:
+    database_host: 127.0.0.1    #db info
+    database_port: 3306         #db info
+    database_name: basic-api    #db info
+    database_user: root         #db info
+    database_password: root     #db info
+    mailer_transport: smtp
+    mailer_host: 127.0.0.1
+    mailer_user: null
+    mailer_password: null
+    mailer_address: "ileotest@yopmail.com"
+    secret: ThisTokenIsNotSoSecretChangeIt
+    jwt_private_key_path: '%kernel.root_dir%/../var/jwt/private.pem'
+    jwt_public_key_path: '%kernel.root_dir%/../var/jwt/public.pem'
+    jwt_key_pass_phrase: basic-api      #here your password set befor with openssl
+    jwt_token_ttl: 3600
 
 ```
 
