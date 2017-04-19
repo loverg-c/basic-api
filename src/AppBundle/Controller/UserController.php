@@ -378,7 +378,7 @@ class UserController extends FOSRestController
      * Delete a user.
      *
      * @Security("is_granted('ROLE_ADMIN')")
-     * 
+     *
      * @ApiDoc(
      *  resource = "User",
      *  description = "Delete a user",
@@ -411,4 +411,6 @@ class UserController extends FOSRestController
 
         return $this->handleView(View::create()->setData('Delete has been done, you will never see it again')->setStatusCode(200));
     }
+
+    //todo : ROLE management
 }
