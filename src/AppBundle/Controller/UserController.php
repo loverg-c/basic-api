@@ -48,11 +48,14 @@ class UserController extends FOSRestController
     {
         $view = View::create();
         $user = $this->getDoctrine()->getRepository("AppBundle:User")->find($id);
-        if (!$user) throw new HttpException(404, "User cannot be found.");
+        if (!$user) {
+            throw new HttpException(404, "User cannot be found.");
+        }
 
         $userAsArr = json_decode($this->get('custom_serializer')->serializeJson($user), true);
         unset($userAsArr["password"]);
         unset($userAsArr["salt"]);
+
         return $this->handleView($view->setData($userAsArr)->setStatusCode(200));
     }
 
@@ -81,6 +84,7 @@ class UserController extends FOSRestController
             unset($userAsArr[$key]["password"]);
             unset($userAsArr[$key]["salt"]);
         }
+
         return $this->handleView($view->setData($userAsArr)->setStatusCode(200));
     }
 
@@ -108,10 +112,13 @@ class UserController extends FOSRestController
     {
         $view = View::create();
         $user = $this->getDoctrine()->getRepository("AppBundle:User")->findOneBy(["email" => $email]);
-        if (!$user) throw new HttpException(404, "This email does not exist.");
+        if (!$user) {
+            throw new HttpException(404, "This email does not exist.");
+        }
 
         $userAsArr = json_decode($this->get('custom_serializer')->serializeJson($user), true);
         unset($userAsArr["password"]);
+
         return $this->handleView($view->setData($userAsArr)->setStatusCode(200));
     }
 
@@ -153,14 +160,18 @@ class UserController extends FOSRestController
 
         //check doublon
         $res = $em->getRepository("AppBundle:User")->findOneBy(["email" => $params["email"]]);
-        if ($res) throw new HttpException(409, "This email already exists.");
+        if ($res) {
+            throw new HttpException(409, "This email already exists.");
+        }
         $res = $em->getRepository("AppBundle:User")->findOneBy(["username" => $params["username"]]);
-        if ($res) throw new HttpException(409, "This username already exists.");
+        if ($res) {
+            throw new HttpException(409, "This username already exists.");
+        }
 
         $form = $this->createForm(UserType::class, $user);
 
         //encodage password
-        $params["salt"] = md5(uniqid());
+        $params["salt"] = bin2hex(random_bytes(255));
         $encoder = $this->get("security.password_encoder");
         $encoded = $encoder->encodePassword($user, $params["password"]);
         $params["password"] = $encoded;
@@ -224,17 +235,22 @@ class UserController extends FOSRestController
         if (!$user) {
             throw new HttpException(404, "User cannot be found.");
         }
-        if ($id != $this->getUser()->getId() && !$this->getUser()->isGranted('ROLE_ADMIN'))
+        if ($id != $this->getUser()->getId() && !$this->getUser()->isGranted('ROLE_ADMIN')) {
             throw new HttpException(403, "You do not have the proper right to update this user.");
+        }
 
         $view = View::create();
         if (isset($params["email"])) {
             $res = $em->getRepository("AppBundle:User")->findOneBy(["email" => $params["email"]]);
-            if ($res && $res->getId() != $id) throw new HttpException(409, "This email already exists.");
+            if ($res && $res->getId() != $id) {
+                throw new HttpException(409, "This email already exists.");
+            }
         }
         if (isset($params["username"])) {
             $res = $em->getRepository("AppBundle:User")->findOneBy(["username" => $params["username"]]);
-            if ($res && $res->getId() != $id) throw new HttpException(409, "This username already exists.");
+            if ($res && $res->getId() != $id) {
+                throw new HttpException(409, "This username already exists.");
+            }
         }
 
         if (isset($params["password"])) {
@@ -247,11 +263,13 @@ class UserController extends FOSRestController
         $userAsArr = json_decode($this->get("custom_serializer")->serializeJson($user), true);
         foreach ($userAsArr as $key => $p) {
             if (!isset($params[$key]) || $params[$key] == null || $params[$key] == '') {
-                    $params[$key] = $p;
+                $params[$key] = $p;
             }
         }
 
-        if (isset($params["id"])) unset($params["id"]);
+        if (isset($params["id"])) {
+            unset($params["id"]);
+        }
 
         $form = $this->createForm(UserType::class, $user);
         $form->submit($params);
@@ -296,8 +314,10 @@ class UserController extends FOSRestController
 
         //check existance
         $user = $em->getRepository("AppBundle:User")->find($id);
-        if (!$user) throw new HttpException(404, "User cannot be found.");
-        
+        if (!$user) {
+            throw new HttpException(404, "User cannot be found.");
+        }
+
         //remove
         $em->remove($user);
         $em->flush();

@@ -5,7 +5,6 @@ namespace AppBundle\DataFixtures\Services;
 use Doctrine\Common\DataFixtures\Executor\ORMExecutor;
 use Doctrine\Common\DataFixtures\FixtureInterface;
 use Doctrine\Common\DataFixtures\Purger\ORMPurger;
-use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bridge\Doctrine\DataFixtures\ContainerAwareLoader;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
@@ -22,7 +21,6 @@ class FixtureAwareTestCase extends KernelTestCase
 
     public function setup()
     {
-
         self::bootKernel();
     }
 
@@ -33,7 +31,6 @@ class FixtureAwareTestCase extends KernelTestCase
      */
     public function addFixture(FixtureInterface $fixture)
     {
-
         $this->getFixtureLoader()->addFixture($fixture);
     }
 
@@ -42,7 +39,6 @@ class FixtureAwareTestCase extends KernelTestCase
      */
     public function executeFixtures()
     {
-
         $this->getFixtureExecutor()->execute($this->getFixtureLoader()->getFixtures());
     }
 
@@ -51,10 +47,11 @@ class FixtureAwareTestCase extends KernelTestCase
      */
     private function getFixtureExecutor()
     {
-
         if (!$this->fixtureExecutor) {
+
             /** @var \Doctrine\ORM\EntityManager $entityManager */
             $entityManager = self::$kernel->getContainer()->get('doctrine')->getManager();
+
             $this->fixtureExecutor = new ORMExecutor($entityManager, new ORMPurger($entityManager));
         }
 
@@ -66,7 +63,6 @@ class FixtureAwareTestCase extends KernelTestCase
      */
     private function getFixtureLoader()
     {
-
         if (!$this->fixtureLoader) {
             $this->fixtureLoader = new ContainerAwareLoader(self::$kernel->getContainer());
         }

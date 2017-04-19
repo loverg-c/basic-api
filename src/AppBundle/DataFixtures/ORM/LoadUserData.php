@@ -27,7 +27,7 @@ class LoadUserData extends AbstractFixture  implements FixtureInterface, Contain
         $user = new User();
         $user->setEmail("user@ileotech.com");
         $user->setUsername('ileo-user');
-        $user->setSalt(md5(uniqid()));
+        $user->setSalt(bin2hex(random_bytes(255)));
         $user->setRole('ROLE_USER');
         $encoder = $this->container->get('security.password_encoder');
         $encoded = $encoder->encodePassword($user, "d1zqvdzz");
@@ -36,7 +36,7 @@ class LoadUserData extends AbstractFixture  implements FixtureInterface, Contain
         $admin = new User();
         $admin->setEmail("admin@ileotech.com");
         $admin->setUsername('ileo-admin');
-        $admin->setSalt(md5(uniqid()));
+        $admin->setSalt(bin2hex(random_bytes(255)));
         $encoder = $this->container->get('security.password_encoder');
         $encoded = $encoder->encodePassword($admin, "d1zqvdzz");
         $admin->setPassword($encoded);

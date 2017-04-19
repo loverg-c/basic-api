@@ -19,6 +19,7 @@ class AuthControllerTest extends TestCase
      */
     private $endpoint = "/auth";
 
+
     /**
      * Admin data
      */
@@ -71,7 +72,7 @@ class AuthControllerTest extends TestCase
      */
     public function testPostAuthenticate200()
     {
-       $this->httpRequest200(
+        $this->httpRequest200(
             ["method" => "POST", "path" => '/api'.$this->endpoint],
             $this->work_data
         );
@@ -100,5 +101,6 @@ class AuthControllerTest extends TestCase
             ["code" => 404, "message" => "Not Found", "exception_message" => "User cannot be found."]
         );
     }
+
 
 }

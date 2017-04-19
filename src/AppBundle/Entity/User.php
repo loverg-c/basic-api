@@ -33,7 +33,6 @@ class User implements UserInterface
      */
     private $username;
 
-
     /**
      * @var string
      * @Assert\NotNull()
@@ -74,6 +73,12 @@ class User implements UserInterface
      */
     private $email;
 
+    /**
+     * @var string
+     * @Type("string")
+     * @ORM\Column(name="recover_token", type="string", length=255, nullable=true)
+     */
+    private $recover_token;
 
     /**
      * Get id
@@ -154,7 +159,6 @@ class User implements UserInterface
         // TODO: Implement eraseCredentials() method.
     }
 
-
     /**
      * @return string
      */
@@ -170,6 +174,23 @@ class User implements UserInterface
     {
         $this->apiKey = $apiKey;
     }
+
+    /**
+     * @return string
+     */
+    public function getRecoverToken()
+    {
+        return $this->recover_token;
+    }
+
+    /**
+     * @param string $recover_token
+     */
+    public function setRecoverToken($recover_token)
+    {
+        $this->recover_token = $recover_token;
+    }
+
 
     /**
      * @return string

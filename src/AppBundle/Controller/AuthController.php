@@ -3,6 +3,7 @@
 
 namespace AppBundle\Controller;
 
+use AppBundle\Entity\User;
 use FOS\RestBundle\Controller\FOSRestController;
 use FOS\RestBundle\Controller\Annotations\Post;
 use FOS\RestBundle\View\View;
@@ -49,7 +50,9 @@ class AuthController extends FOSRestController
         $password = $request->request->get("password");
         $user = $this->getDoctrine()->getRepository("AppBundle:User")->findOneBy(["username" => $email]);
 
-        if (!$user) throw new HttpException(404, "User cannot be found.");
+        if (!$user) {
+            throw new HttpException(404, "User cannot be found.");
+        }
         if (!$this->get("security.password_encoder")->isPasswordValid($user, $password)) {
             throw new HttpException(400, "Invalid password.");
         }
@@ -59,6 +62,7 @@ class AuthController extends FOSRestController
         return new JsonResponse(['token' => $token, 'idUser' => $user->getId()]);
     }
 
+    //todo only anonymous
     /**
      * Send a mail providing a token to recover a forgotten password.
      *
@@ -84,23 +88,30 @@ class AuthController extends FOSRestController
         $view = View::create();
         $em = $this->getDoctrine()->getManager();
 
+        /** @var User $user */
         $user = $em->getRepository("AppBundle:User")->findOneBy(["username" => $request->request->get("username")]);
-        if (!$user) throw new HttpException(404, "This username does not exist.");
+        if (!$user) {
+            throw new HttpException(404, "This username does not exist.");
+        }
+
+        $user->setRecoverToken(bin2hex(random_bytes(255)));
+        $em->persist($user);
+        $em->flush();
 
         $message = \Swift_Message::newInstance()
-            ->setSubject("Recovernig password from Efficiency")
-            ->setFrom("econox@gmail.com")
+            ->setSubject("Recovernig password from basic-api")
+            ->setFrom($this->getParameter('mailer_address'))
             ->setTo($user->getEmail())
             ->setBody(
-                "<h3>Hi " . $user->getFirstName() . " " . $user->getLastName() . "</h3>
-                To recover your password, enter this token to the recoving password form :<br><br>" .
-                $user->getPassword() . "<br><br>
-                Thanks!",
+                $this->renderView(
+                    'AppBundle::recover_password.html.twig',
+                    array("username" => $user->getUsername(), "userlink" => $user->getRecoverToken()) //todo a real link
+                ),
                 "text/html"
             );
         $this->get("mailer")->send($message);
 
-        return $this->handleView($view->setData(null)->setStatusCode(204));
+        return $this->handleView($view->setData( $user->getRecoverToken())->setStatusCode(200));
     }
 
     /**
@@ -133,13 +144,20 @@ class AuthController extends FOSRestController
         $email = $request->request->get("username");
         $password = $request->request->get("password");
 
+        /** @var User $user */
         $user = $em->getRepository("AppBundle:User")->findOneBy(["username" => $email]);
-        if (!$user) throw new HttpException(404, "This username does not exist.");
-        if ($user->getPassword() !== $token) throw new HttpException(400, "Invalid token.");
+        if (!$user) {
+            throw new HttpException(404, "This username does not exist.");
+        }
+
+        if ($user->getRecoverToken() !== $token) {
+            throw new HttpException(400, "Invalid token.");
+        }
 
         $encoder = $this->get("security.password_encoder");
         $new_password = $encoder->encodePassword($user, $password);
         $user->setPassword($new_password);
+        $user->setRecoverToken(null);
         $em->persist($user);
         $em->flush();
 
