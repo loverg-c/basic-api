@@ -43,13 +43,6 @@ class User implements UserInterface
 
     /**
      * @var string
-     * @Type("string")
-     * @ORM\Column(type="string", unique=true, nullable=true)
-     */
-    private $apiKey;
-
-    /**
-     * @var string
      * @Assert\NotNull()
      * @Type("string")
      * @ORM\Column(name="salt", type="string", length=255, nullable=false)
@@ -79,6 +72,15 @@ class User implements UserInterface
      * @ORM\Column(name="recover_token", type="string", length=255, nullable=true)
      */
     private $recover_token;
+
+    /**
+     * User constructor.
+     * @param string $role
+     */
+    public function __construct()
+    {
+        $this->role = 'ROLE_USER';
+    }
 
     /**
      * Get id
@@ -154,25 +156,19 @@ class User implements UserInterface
         $this->email = $email;
     }
 
+    /**
+     * Clean sensitive data
+     */
+    public function eraseSensitive()
+    {
+        $this->password = null;
+        $this->salt = null;
+        $this->recover_token = null;
+    }
+
     public function eraseCredentials()
     {
         // TODO: Implement eraseCredentials() method.
-    }
-
-    /**
-     * @return string
-     */
-    public function getApiKey()
-    {
-        return $this->apiKey;
-    }
-
-    /**
-     * @param string $apiKey
-     */
-    public function setApiKey($apiKey)
-    {
-        $this->apiKey = $apiKey;
     }
 
     /**
@@ -190,7 +186,6 @@ class User implements UserInterface
     {
         $this->recover_token = $recover_token;
     }
-
 
     /**
      * @return string

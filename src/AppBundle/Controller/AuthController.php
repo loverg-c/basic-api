@@ -111,7 +111,7 @@ class AuthController extends FOSRestController
             );
         $this->get("mailer")->send($message);
 
-        return $this->handleView($view->setData( $user->getRecoverToken())->setStatusCode(200));
+        return $this->handleView($view->setData(null)->setStatusCode(204));
     }
 
     /**
