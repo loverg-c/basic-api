@@ -415,5 +415,75 @@ class UserController extends FOSRestController
         );
     }
 
-    //todo : ROLE management
+    /**
+     * Update role for a user.
+     *
+     * @Patch("/users/{id}/change_role")
+     *
+     * @Security("is_granted('ROLE_ADMIN')")
+     *
+     * @ApiDoc(
+     *  resource = "User",
+     *  description = "Update role of an existing user",
+     *  requirements = {
+     *      { "name" = "id", "dataType" = "int", "requirement" = "\d+", "description" = "User id" }
+     *  },
+     *  parameters = {
+     *      { "name"="role", "dataType"="string", "required"=false, "format"="(ROLE_USER|ROLE_ADMIN|ROLE_SUPER_ADMIN)", "description"="New role, can be ROLE_USER, ROLE_ADMIN, ROLE_SUPER_ADMIN" }
+     *  },
+     *  statusCodes = {
+     *      200 = "Returned when successful",
+     *      400 = "Returned when a/some parameter(s) is/are invalid",
+     *      403 = "Returned when the request is forbidden",
+     *      404 = "Returned when the user not found"
+     *  }
+     * )
+     *
+     * @RequestParam(name="role", nullable=false, requirements="(ROLE_USER|ROLE_ADMIN|ROLE_SUPER_ADMIN)", strict=true, description="The new role")
+     *
+     * @param int $id
+     * @param ParamFetcher $paramfetcher
+     * @return Response
+     */
+    public function patchUserRoleAction($id, ParamFetcher $paramfetcher)
+    {
+        $params = $paramfetcher->all();
+        $em = $this->getDoctrine()->getManager();
+        $user = $em->getRepository('AppBundle:User')->find($id);
+
+        if (!$user) {
+            throw new HttpException(404, "User cannot be found.");
+        }
+
+        if (!$this->get('security.authorization_checker')->isGranted('ROLE_ADMIN')) {
+            throw new HttpException(403, "You do not have the proper right to update this user.");
+        }
+
+
+        $userAsArr = json_decode($this->get("custom_serializer")->serializeJson($user), true);
+        foreach ($userAsArr as $key => $p) {
+            if (!isset($params[$key]) || $params[$key] == null || $params[$key] == '') {
+                $params[$key] = $p;
+            }
+        }
+
+        if (isset($params["id"])) {
+            unset($params["id"]);
+        }
+
+        $form = $this->createForm(UserType::class, $user);
+        $form->submit($params);
+
+        if ($form->isValid() == false) {
+            return $this->handleView(View::create()->setData($form->getErrors())->setStatusCode(400));
+        }
+
+        $em->persist($user);
+        $em->flush();
+
+        $user->eraseSensitive();
+
+        return $this->handleView(View::create()->setData($user)->setStatusCode(200));
+    }
+
 }

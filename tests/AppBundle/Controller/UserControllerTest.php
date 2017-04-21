@@ -719,7 +719,120 @@ class UserControllerTest extends TestCase
             ]
         );
     }
-    
-    //todo PATCH
+
+    /**
+     * PatchRole a user : PatchRole /users/:user_id
+     * Tests:
+     * - 200: successful
+     * - 401: token not provided
+     * - 403: forbidden request when the token belongs to a user with no proper right to perform the request
+     * - 404: token provided but invalid
+     * - 404: user cannot be found
+     * - 409: email already taken
+     * - 409: username already taken
+     */
+
+
+    /**
+     * @group patchRoleUser
+     */
+    public function testPatchRoleUser_400_wrongData()
+    {
+        $this->httpRequest400(
+            [
+                "method" => "PATCH",
+                "path" => '/api'.$this->endpoint."/".$this->user["id"]."/change_role",
+                "token" => $this->admin["token"],
+            ],
+            ["role" => "ROLE_TOTO"],
+            ["code" => 400, "message" => "Bad Request"]
+        );
+    }
+
+    /**
+     * @group patchRoleUser
+     */
+    public function testPatchRoleUser_401_tokenNotProvided()
+    {
+        $this->httpRequest401(
+            [
+                "method" => "PATCH",
+                "path" => '/api'.$this->endpoint."/".$this->user["id"]."/change_role",
+            ]
+        );
+    }
+
+    /**
+     * @group patchRoleUser
+     */
+    public function testPatchRoleUser_403_forbidden()
+    {
+        $this->httpRequest403(
+            [
+                "method" => "PATCH",
+                "path" => '/api'.$this->endpoint."/".$this->admin["id"]."/change_role",
+                "token" => $this->user["token"],
+            ],
+            ["role" => "ROLE_ADMIN"],
+            [
+                "code" => 403,
+                "message" => "Forbidden",
+            ]
+        );
+    }
+
+    /**
+     * @group patchRoleUser
+     */
+    public function testPatchRoleUser_404_invalidToken()
+    {
+        $this->httpRequest404(
+            [
+                "method" => "PATCH",
+                "path" => '/api'.$this->endpoint."/".$this->user["id"]."/change_role",
+                "token" => substr($this->admin["token"], 0, -1),
+            ],
+            ["role" => "ROLE_ADMIN"],
+            [
+                "code" => 404,
+                "message" => "Not Found",
+                "exception_message" => "User cannot be found.",
+
+            ]
+        );
+    }
+
+    /**
+     * @group patchRoleUser
+     */
+    public function testPatchRoleUser_404_onUser()
+    {
+        $this->httpRequest404(
+            ["method" => "PATCH", "path" => '/api'.$this->endpoint."/0/change_role", "token" => $this->admin["token"]],
+            ["role" => "ROLE_ADMIN"],
+            ["code" => 404, "message" => "Not Found", "exception_message" => "User cannot be found."]
+        );
+    }
+
+
+    /**
+     * @group patchRoleUser
+     */
+    public function testPatchRoleUser_200_succesful()
+    {
+        $this->httpRequest200(
+            [
+                "method" => "PATCH",
+                "path" => '/api'.$this->endpoint."/".$this->user["id"]."/change_role",
+                "token" => $this->admin["token"],
+            ],
+            ["role" => "ROLE_ADMIN"],
+            [
+                "email" => "user@ileotech.com",
+                "username" => "ileo-user",
+                "role" => "ROLE_ADMIN",
+            ]
+        );
+    }
 
 }
