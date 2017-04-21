@@ -237,8 +237,7 @@ class UserController extends FOSRestController
         if (!$user) {
             throw new HttpException(404, "User cannot be found.");
         }
-
-        if ($id != $this->getUser()->getId() && !$this->getUser()->isGranted('ROLE_ADMIN')) {
+        if ($id != $this->getUser()->getId() && !$this->get('security.authorization_checker')->isGranted('ROLE_ADMIN')) {
             throw new HttpException(403, "You do not have the proper right to update this user.");
         }
 
@@ -267,7 +266,7 @@ class UserController extends FOSRestController
         $form->submit($params);
 
         if ($form->isValid() == false) {
-            return $this->handleView(View::create()->setData($form->getErrors())->setStatusCode(400));
+            throw new HttpException(400, $form->getErrors());
         }
 
         $em->persist($user);

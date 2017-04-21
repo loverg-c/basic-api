@@ -432,12 +432,166 @@ class UserControllerTest extends TestCase
             ),
             null,
             [
-                "exception_message" => "Delete has been done, you will never see it again"
+                "exception_message" => "Delete has been done, you will never see it again",
             ]
         );
     }
 
-    //todo PUT
+
+    /**
+     * Put a user : PUT /users/:user_id
+     * Tests:
+     * - 200: successful
+     * - 400: some null value
+     * - 401: token not provided
+     * - 403: forbidden request when the token belongs to a user with no proper right to perform the request
+     * - 404: token provided but invalid
+     * - 404: user cannot be found
+     * - 409: email already taken
+     * - 409 : username already taken
+     */
+
+    /**
+     * @group putUser
+     */
+    public function testPutUser_400_nullInForm()
+    {
+        $data = $this->user_data;
+        $data['username'] = '';
+        $this->httpRequest400(
+            [
+                "method" => "PUT",
+                "path" => '/api'.$this->endpoint."/".$this->user["id"],
+                "token" => $this->admin["token"],
+            ],
+            $data,
+            ["code" => 400, "message" => "Bad Request"]
+        );
+    }
+
+    /**
+     * @group putUser
+     */
+    public function testPutUser_401_tokenNotProvided()
+    {
+        $this->httpRequest401(array("method" => "PUT", "path" => '/api'.$this->endpoint."/".$this->user["id"]));
+    }
+
+    /**
+     * @group putUser
+     */
+    public function testPutUser_403_forbidden()
+    {
+        $this->httpRequest403(
+            [
+                "method" => "PUT",
+                "path" => '/api'.$this->endpoint."/".$this->admin["id"],
+                "token" => $this->user["token"],
+            ],
+            $this->user_data,
+            [
+                "code" => 403,
+                "message" => "Forbidden",
+                'exception_message' => 'You do not have the proper right to update this user.',
+            ]
+        );
+    }
+
+    /**
+     * @group putUser
+     */
+    public function testPutUser_404_invalidToken()
+    {
+        $this->httpRequest404(
+            [
+                "method" => "PUT",
+                "path" => '/api'.$this->endpoint."/".$this->user["id"],
+                "token" => substr($this->admin["token"], 0, -1),
+            ],
+            $this->user_data,
+            [
+                "code" => 404,
+                "message" => "Not Found",
+                "exception_message" => "User cannot be found.",
+
+            ]
+        );
+    }
+
+    /**
+     * @group putUser
+     */
+    public function testPutUser_404_onUser()
+    {
+        $this->httpRequest404(
+            ["method" => "PUT", "path" => '/api'.$this->endpoint."/0", "token" => $this->admin["token"]],
+            $this->user_data,
+            ["code" => 404, "message" => "Not Found", "exception_message" => "User cannot be found."]
+        );
+    }
+
+    /**
+     * @group putUser
+     */
+    public function testPutUser_409_emailAlreadyExists()
+    {
+        $data = $this->user_data;
+        $data["email"] = "user@ileotech.com";
+        $this->httpRequest409(
+            [
+                "method" => "PUT",
+                "path" => '/api'.$this->endpoint."/".$this->admin['id'],
+                "token" => $this->admin["token"],
+            ],
+            $data,
+            ["code" => 409, "message" => "Conflict", "exception_message" => "This email already exists."]
+        );
+    }
+
+    /**
+     * @group putUser
+     */
+    public function testPutUser_409_usernameAlreadyExists()
+    {
+        $data = $this->user_data;
+        $data["username"] = "ileo-user";
+        $this->httpRequest409(
+            [
+                "method" => "PUT",
+                "path" => '/api'.$this->endpoint."/".$this->admin['id'],
+                "token" => $this->admin["token"],
+            ],
+            $data,
+            ["code" => 409, "message" => "Conflict", "exception_message" => "This username already exists."]
+        );
+    }
+
+    /**
+     * @group putUser
+     */
+    public function testPutUser_200_successful()
+    {
+
+        $data = $this->user_data;
+
+        $data["username"] = "user-test[PUT]";
+
+        $this->httpRequest200(
+            [
+                "method" => "PUT",
+                "path" => '/api'.$this->endpoint."/".$this->user["id"],
+                "token" => $this->admin["token"],
+            ],
+            $data,
+            [
+                "email" => "user-test@ileotech.com",
+                "username" => "user-test[PUT]",
+                "role" => "ROLE_USER",
+            ]
+        );
+    }
+
+    //todo PUT 200 ok
     //todo PATCH
 
 }

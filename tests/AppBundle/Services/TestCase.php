@@ -36,7 +36,7 @@ abstract class TestCase extends WebTestCase
             $this->client->setServerParameter("HTTP_Authorization", sprintf("Bearer %s", $params["token"]));
         }
         $http = [];
-        if ($params["method"] === "GET" || $params["method"] === "DELETE") {
+        if ($params["method"] === "GET" || $params["method"] === "DELETE" || $data == null) {
             $this->client->request($params["method"], $params["path"]);
         } else {
             $this->client->request($params["method"], $params["path"], $data);
@@ -62,7 +62,7 @@ abstract class TestCase extends WebTestCase
         $http = $this->request($params, $data);
 
 //         if ($http["response"]->getStatusCode() != 200)
-        //  var_dump($http["decoded"]);
+//var_dump($http['decoded']);
 
         $this->assertEquals(200, $http["response"]->getStatusCode());
         if ($expected) {
@@ -114,7 +114,7 @@ abstract class TestCase extends WebTestCase
     public function httpRequest400(
         $params,
         $data = null,
-        $expected = ["code" => 400, "message" => "Bad Request", "exception_message" => "Bad Request"]
+        $expected = ["code" => 400, "message" => "Bad Request"]
     ) {
         $http = $this->request(
             $params,
@@ -127,7 +127,13 @@ abstract class TestCase extends WebTestCase
         if ($expected) {
             $this->assertEquals($expected["code"], $http["decoded"]["error"]["code"]);
             $this->assertEquals($expected["message"], $http["decoded"]["error"]["message"]);
-            $this->assertEquals($expected["exception_message"], $http["decoded"]["error"]["exception"][0]["message"]);
+
+            if (isset($expected["exception_message"])) {
+                $this->assertEquals(
+                    $expected["exception_message"],
+                    $http["decoded"]["error"]["exception"][0]["message"]
+                );
+            }
         }
 
         return $http["decoded"];
