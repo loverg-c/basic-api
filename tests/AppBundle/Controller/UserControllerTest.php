@@ -448,7 +448,7 @@ class UserControllerTest extends TestCase
      * - 404: token provided but invalid
      * - 404: user cannot be found
      * - 409: email already taken
-     * - 409 : username already taken
+     * - 409: username already taken
      */
 
     /**
@@ -591,7 +591,135 @@ class UserControllerTest extends TestCase
         );
     }
 
-    //todo PUT 200 ok
+
+    /**
+     * Patch a user : PATCH /users/:user_id
+     * Tests:
+     * - 200: successful
+     * - 401: token not provided
+     * - 403: forbidden request when the token belongs to a user with no proper right to perform the request
+     * - 404: token provided but invalid
+     * - 404: user cannot be found
+     * - 409: email already taken
+     * - 409: username already taken
+     */
+
+    /**
+     * @group patchUser
+     */
+    public function testPatchUser_401_tokenNotProvided()
+    {
+        $this->httpRequest401(array("method" => "PATCH", "path" => '/api'.$this->endpoint."/".$this->user["id"]));
+    }
+
+    /**
+     * @group patchUser
+     */
+    public function testPatchUser_403_forbidden()
+    {
+        $this->httpRequest403(
+            [
+                "method" => "PATCH",
+                "path" => '/api'.$this->endpoint."/".$this->admin["id"],
+                "token" => $this->user["token"],
+            ],
+            $this->user_data,
+            [
+                "code" => 403,
+                "message" => "Forbidden",
+                'exception_message' => 'You do not have the proper right to update this user.',
+            ]
+        );
+    }
+
+    /**
+     * @group patchUser
+     */
+    public function testPatchUser_404_invalidToken()
+    {
+        $this->httpRequest404(
+            [
+                "method" => "PATCH",
+                "path" => '/api'.$this->endpoint."/".$this->user["id"],
+                "token" => substr($this->admin["token"], 0, -1),
+            ],
+            $this->user_data,
+            [
+                "code" => 404,
+                "message" => "Not Found",
+                "exception_message" => "User cannot be found.",
+
+            ]
+        );
+    }
+
+    /**
+     * @group patchUser
+     */
+    public function testPatchUser_404_onUser()
+    {
+        $this->httpRequest404(
+            ["method" => "PATCH", "path" => '/api'.$this->endpoint."/0", "token" => $this->admin["token"]],
+            $this->user_data,
+            ["code" => 404, "message" => "Not Found", "exception_message" => "User cannot be found."]
+        );
+    }
+
+    /**
+     * @group patchUser
+     */
+    public function testPatchUser_409_emailAlreadyExists()
+    {
+        $data = $this->user_data;
+        $data["email"] = "user@ileotech.com";
+        $this->httpRequest409(
+            [
+                "method" => "PATCH",
+                "path" => '/api'.$this->endpoint."/".$this->admin['id'],
+                "token" => $this->admin["token"],
+            ],
+            ["email" => "user@ileotech.com"],
+            ["code" => 409, "message" => "Conflict", "exception_message" => "This email already exists."]
+        );
+    }
+
+    /**
+     * @group patchUser
+     */
+    public function testPatchUser_409_usernameAlreadyExists()
+    {
+        $this->httpRequest409(
+            [
+                "method" => "PATCH",
+                "path" => '/api'.$this->endpoint."/".$this->admin['id'],
+                "token" => $this->admin["token"],
+            ],
+            ["username" => "ileo-user"],
+            ["code" => 409, "message" => "Conflict", "exception_message" => "This username already exists."]
+        );
+    }
+
+    /**
+     * @group patchUser
+     */
+    public function testPatchUser_200_successful()
+    {
+
+        $this->httpRequest200(
+            [
+                "method" => "PATCH",
+                "path" => '/api'.$this->endpoint."/".$this->user["id"],
+                "token" => $this->admin["token"],
+            ],
+            ["username" => "user-test[PATCH]"],
+            [
+                "email" => "user@ileotech.com",
+                "username" => "user-test[PATCH]",
+                "role" => "ROLE_USER",
+            ]
+        );
+    }
+    
     //todo PATCH
 
 }
