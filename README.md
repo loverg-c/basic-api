@@ -3,6 +3,21 @@ A Symfony project created on April 2, 2017, 4:00 pm.
 A basic api with symfony 3.2, lexik jwt, nelmio, jms, fosrest
 This API allow you to connect and manage user
 
+
+1. [Prerequisites](#prerequisites)
+2. [Setup](#setup)
+   * [Installation](#installation)
+   * [Database config](#database-config)
+   * [Keys generation](#keys-generation)
+   * [Config files](#config-files)
+   * [Run](#run)
+   * [Routes](#routes)
+3. [Test](#test)
+   * [Database config for test env](#database-config-for-test-env)
+4. [Api Doc](#api-doc)
+5. [Connecting a client](#connecting-a-client)
+6. [References](#references)
+
 ## Prerequisites
 
 - composer
@@ -59,7 +74,7 @@ parameters:
 
 #### Routes
 
-`$> ./bin/console route:debug`
+`$> ./bin/console debug:router`
 
 ## Test
 
