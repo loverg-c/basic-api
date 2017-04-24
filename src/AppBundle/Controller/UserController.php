@@ -153,6 +153,16 @@ class UserController extends FOSRestController
         $em = $this->getDoctrine()->getManager();
         $params = $paramFetcher->all();
 
+
+        if ( preg_match('/\s/',$params["username"])){
+            throw new HttpException(400, "The username contains space(s)");
+        }
+
+        if ( preg_match('/\s/',$params["password"])){
+            throw new HttpException(400, "The password contains space(s)");
+        }
+
+
         //check doublon
         $res = $em->getRepository("AppBundle:User")->findOneBy(["email" => $params["email"]]);
         if ($res) {
@@ -162,6 +172,7 @@ class UserController extends FOSRestController
         if ($res) {
             throw new HttpException(409, "This username already exists.");
         }
+
 
         $user = new User();
 

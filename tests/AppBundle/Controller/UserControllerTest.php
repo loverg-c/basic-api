@@ -139,6 +139,35 @@ class UserControllerTest extends TestCase
         );
     }
 
+    /**
+     * @group postuser
+     */
+    public function testPostUser_400_spaceInUsername()
+    {
+        $data = $this->user_data;
+        $data["username"] = "il eo-ad min";
+        $this->httpRequest400(
+            ["method" => "POST", "path" => '/api'.$this->endpoint, "token" => $this->admin["token"]],
+            $data,
+            ["code" => 400, "message" => "Bad Request", "exception_message" => "The username contains space(s)"]
+        );
+    }
+
+
+    /**
+     * @group postuser
+     */
+    public function testPostUser_400_spaceInPassword()
+    {
+        $data = $this->user_data;
+        $data["password"] = "il eo-ad min";
+        $this->httpRequest400(
+            ["method" => "POST", "path" => '/api'.$this->endpoint, "token" => $this->admin["token"]],
+            $data,
+            ["code" => 400, "message" => "Bad Request", "exception_message" => "The password contains space(s)"]
+        );
+    }
+
 
     /**
      * Get a user by id: GET /users/:user_id
