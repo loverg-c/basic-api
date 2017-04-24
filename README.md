@@ -59,7 +59,7 @@ parameters:
 
 #### Routes
 
-`$> ./bin/console route:debug`
+`$> ./bin/console debug:router`
 
 ## Test
 
