@@ -5,3 +5,7 @@ auth:
 users:
     type:        rest
     resource:    AppBundle\Controller\UserController
+
+change_password:
+    path:     /change_password/{token}
+    defaults: { _controller: AppBundle:Auth:changePassword }

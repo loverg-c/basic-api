@@ -4,17 +4,20 @@
 namespace AppBundle\Controller;
 
 use AppBundle\Entity\User;
+use AppBundle\Form\RecoverPasswordForm;
 use FOS\RestBundle\Controller\FOSRestController;
 use FOS\RestBundle\Controller\Annotations\Post;
 use FOS\RestBundle\View\View;
 
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Annotation\Route;
 
 /**
  * Class AuthController
@@ -63,6 +66,7 @@ class AuthController extends FOSRestController
     }
 
     //todo only anonymous
+
     /**
      * Send a mail providing a token to recover a forgotten password.
      *
@@ -94,7 +98,7 @@ class AuthController extends FOSRestController
             throw new HttpException(404, "This username does not exist.");
         }
 
-        $user->setRecoverToken(bin2hex(random_bytes(255)));
+        $user->setRecoverToken(bin2hex(random_bytes(126)));
         $em->persist($user);
         $em->flush();
 
@@ -105,14 +109,62 @@ class AuthController extends FOSRestController
             ->setBody(
                 $this->renderView(
                     'AppBundle::recover_password.html.twig',
-                    array("username" => $user->getUsername(), "userlink" => $user->getRecoverToken()) //todo a real link
+                    array(
+                        "username" => $user->getUsername(),
+                        "usertoken" => $user->getRecoverToken(),
+                    )
                 ),
                 "text/html"
             );
         $this->get("mailer")->send($message);
 
-        return $this->handleView($view->setData(null)->setStatusCode(204));
+        return $this->handleView($view->setData("email send to ".$user->getEmail())->setStatusCode(200));
     }
+
+
+    /**
+     *
+     * @param Request $request
+     * @param string $token
+     *
+     * @return Response
+     *
+     */
+    public function changePasswordAction(Request $request, $token)
+    {
+
+        $form = $this->createForm(RecoverPasswordForm::class);
+        if ($request->isMethod('POST')) {
+
+            $form->handleRequest($request);
+            if ($form->isValid()) {
+                $data = $form->getData();
+                $em = $this->getDoctrine()->getManager();
+                if (($userToChange = $em->getRepository('AppBundle:User')->findOneBy(
+                        array("recover_token" => $token)
+                    )) != null
+                ) {
+                    $encoder = $this->get("security.password_encoder");
+                    $new_password = $encoder->encodePassword($userToChange, $data['password']);
+                    $userToChange->setPassword($new_password);
+                    $userToChange->setRecoverToken(null);
+                    $em->persist($userToChange);
+                    $em->flush();
+                }
+                return $this->render(
+                    'AppBundle::okay_password.html.twig'
+                );
+            }
+        }
+
+        return $this->render(
+            'AppBundle::change_password.html.twig',
+            array(
+                'form' => $form->createView(),
+            )
+        );
+    }
+
 
     /**
      * Update the new password if the token is valid.

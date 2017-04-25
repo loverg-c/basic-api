@@ -29,7 +29,3 @@ monolog:
         #chromephp:
         #    type:   chromephp
         #    level:  info
-
-swiftmailer:
-    disable_delivery: true
-    delivery_addresses: ['ileotest@yopmail.com']

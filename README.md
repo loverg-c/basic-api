@@ -55,15 +55,15 @@ parameters:
     database_name: basic-api    #db info
     database_user: root         #db info
     database_password: root     #db info
-    mailer_transport: smtp
+    mailer_transport: gmail
     mailer_host: 127.0.0.1
-    mailer_user: null
-    mailer_password: null
-    mailer_address: "ileotest@yopmail.com"
+    mailer_user: ileotechmail@gmail.com
+    mailer_password: d1zqvdzz
+    mailer_address: "ileotechmail@gmail.com"
     secret: ThisTokenIsNotSoSecretChangeIt
     jwt_private_key_path: '%kernel.root_dir%/../var/jwt/private.pem'
     jwt_public_key_path: '%kernel.root_dir%/../var/jwt/public.pem'
-    jwt_key_pass_phrase: basic-api      #here your password set befor with openssl
+    jwt_key_pass_phrase: basic-api
     jwt_token_ttl: 3600
 
 ```

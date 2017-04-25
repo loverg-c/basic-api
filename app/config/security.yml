@@ -31,6 +31,12 @@ security:
             methods: [POST]
             anonymous: ~
 
+        change_password:
+            pattern: ^/api/change_password/.*$
+            stateless: true
+            methods: [POST, GET]
+            anonymous: ~
+
         api:
             pattern: ^/api
             stateless: true
