@@ -4,21 +4,26 @@
 parameters:
     database_host:     127.0.0.1
     database_port:     ~
-    database_name:     symfony
+    database_name:     basic-api
     database_user:     root
     database_password: ~
     # You should uncomment this if you want use pdo_sqlite
     # database_path: "%kernel.root_dir%/data.db3"
 
-    mailer_transport:  smtp
+    mailer_transport:  gmail
     mailer_host:       127.0.0.1
-    mailer_user:       ~
+    mailer_user:       ileotechmail@gmail.com
     mailer_password:   ~
+    mailer_address:    "ileotechmail@gmail.com"
 
     # A secret key that's used to generate certain security-related tokens
     secret:            ThisTokenIsNotSoSecretChangeIt
 
     jwt_private_key_path: '%kernel.root_dir%/../var/jwt/private.pem' # ssh private key path
     jwt_public_key_path:  '%kernel.root_dir%/../var/jwt/public.pem'  # ssh public key path
-    jwt_key_pass_phrase:  'basic-api'                                         # ssh key pass phrase
+    jwt_key_pass_phrase:  'basic-api'                                # ssh key pass phrase
     jwt_token_ttl:        3600
+
+    basic_api.ftp_path:      127.0.0.1  # ftp address
+    basic_api.ftp_login:     ~          # ftp login
+    basic_api.ftp_password:  ~          # ftp password
