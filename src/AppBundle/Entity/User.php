@@ -74,6 +74,13 @@ class User implements UserInterface
     private $recover_token;
 
     /**
+     * @var string
+     * @Type("string")
+     * @ORM\Column(name="path_avatar", type="string", length=255, nullable=true)
+     */
+    private $pathAvatar;
+
+    /**
      * User constructor.
      * @param string $role
      */
@@ -210,5 +217,23 @@ class User implements UserInterface
     {
         return array($this->role);
     }
+
+    /**
+     * @return string
+     */
+    public function getPathAvatar()
+    {
+        return $this->pathAvatar;
+    }
+
+    /**
+     * @param string $pathAvatar
+     */
+    public function setPathAvatar($pathAvatar)
+    {
+        $this->pathAvatar = $pathAvatar;
+    }
+
+
 
 }

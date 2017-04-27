@@ -10,6 +10,7 @@ This API allow you to connect and manage user
    * [Database config](#database-config)
    * [Keys generation](#keys-generation)
    * [Config files](#config-files)
+   * [FTP server](#ftp-server)
    * [Run](#run)
    * [Routes](#routes)
 3. [Test](#test)
@@ -22,7 +23,8 @@ This API allow you to connect and manage user
 
 - composer
 - openssl
-- php >= 7.0.1
+- php >= 7.0.0
+- ftp
 
 ## Setup
 
@@ -65,8 +67,22 @@ parameters:
     jwt_public_key_path: '%kernel.root_dir%/../var/jwt/public.pem'
     jwt_key_pass_phrase: basic-api
     jwt_token_ttl: 3600
-
+    basic_api.ftp_path: 127.0.0.1       #ftp_info
+    basic_api.ftp_login: ileotech       #ftp_info
+    basic_api.ftp_password: d1zqvdzz    #ftp_info
 ```
+
+#### FTP server
+
+If you want to use ftp function like avatar upload you should launch a ftp server.
+
+For launching it locally
+
+`$> ftp localhost `
+
+Then for login : a user from your computer and his password.
+
+And change the parameter file consequently
 
 #### Run
 

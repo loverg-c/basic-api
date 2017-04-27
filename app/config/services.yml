@@ -16,3 +16,7 @@ services:
     app.jwt_token_authenticator:
         class:          AppBundle\Security\JwtAuthenticator
         arguments:      ["@doctrine.orm.entity_manager", "@lexik_jwt_authentication.encoder"]
+
+    app.ftp_connect:
+        class:          AppBundle\Services\FtpConnect
+        arguments:      ["@service_container"]

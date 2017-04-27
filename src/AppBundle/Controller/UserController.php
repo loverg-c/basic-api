@@ -3,6 +3,9 @@
 
 namespace AppBundle\Controller;
 
+use AppBundle\Services\FtpConnect;
+use Doctrine\ORM\Query\Parameter;
+use FOS\RestBundle\Controller\Annotations\FileParam;
 use FOS\RestBundle\Controller\Annotations\Patch;
 use FOS\RestBundle\Controller\FOSRestController;
 use FOS\RestBundle\Controller\Annotations\Post;
@@ -17,6 +20,9 @@ use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 
 use AppBundle\Entity\User as User;
 
+use Symfony\Component\HttpFoundation\File\File;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use AppBundle\Form\UserType;
@@ -154,11 +160,11 @@ class UserController extends FOSRestController
         $params = $paramFetcher->all();
 
 
-        if ( preg_match('/\s/',$params["username"])){
+        if (preg_match('/\s/', $params["username"])) {
             throw new HttpException(400, "The username contains space(s)");
         }
 
-        if ( preg_match('/\s/',$params["password"])){
+        if (preg_match('/\s/', $params["password"])) {
             throw new HttpException(400, "The password contains space(s)");
         }
 
@@ -248,7 +254,10 @@ class UserController extends FOSRestController
         if (!$user) {
             throw new HttpException(404, "User cannot be found.");
         }
-        if ($id != $this->getUser()->getId() && !$this->get('security.authorization_checker')->isGranted('ROLE_ADMIN')) {
+        if ($id != $this->getUser()->getId() && !$this->get('security.authorization_checker')->isGranted(
+                'ROLE_ADMIN'
+            )
+        ) {
             throw new HttpException(403, "You do not have the proper right to update this user.");
         }
 
@@ -332,7 +341,10 @@ class UserController extends FOSRestController
             throw new HttpException(404, "User cannot be found.");
         }
 
-        if ($id != $this->getUser()->getId() && !$this->get('security.authorization_checker')->isGranted('ROLE_ADMIN')) {
+        if ($id != $this->getUser()->getId() && !$this->get('security.authorization_checker')->isGranted(
+                'ROLE_ADMIN'
+            )
+        ) {
             throw new HttpException(403, "You do not have the proper right to update this user.");
         }
 
@@ -489,6 +501,84 @@ class UserController extends FOSRestController
             return $this->handleView(View::create()->setData($form->getErrors())->setStatusCode(400));
         }
 
+        $em->persist($user);
+        $em->flush();
+
+        $user->eraseSensitive();
+
+        return $this->handleView(View::create()->setData($user)->setStatusCode(200));
+    }
+
+    /**
+     * Add/change avatar to user.
+     *
+     * @Post("/users/{id}/avatar")
+     *
+     * @ApiDoc(
+     *  resource = "User",
+     *  description = "Change user's avatar",
+     *  parameters = {
+     *      { "name"="avatar", "dataType"="file", "required"=true, "format"="", "description"="New avatar" }
+     *  },
+     *  statusCodes = {
+     *      200 = "Returned when successful",
+     *      400 = "Invalid or null file",
+     *      404 = "User not found",
+     *      403 = "Returned when the request is forbidden"
+     *  }
+     * )
+     *
+     * @return Response
+     */
+    public function postUserAvatarAction(Request $request, $id)
+    {
+        /** @var UploadedFile $uploadedFile */
+        $uploadedFile = $request->files->get('avatar');
+
+        //handle error
+        if (!$uploadedFile || !$uploadedFile->isValid()) {
+            throw new HttpException(400, 'Invalid uploaded file.');
+        }
+        $em = $this->getDoctrine()->getManager();
+        /** @var User|null $user */
+        $user = $em->getRepository('AppBundle:User')->find($id);
+        if (!$user) {
+            throw new HttpException(404, "User cannot be found.");
+        }
+        if ($id != $this->getUser()->getId() &&
+            !$this->get('security.authorization_checker')->isGranted('ROLE_ADMIN')
+        ) {
+            throw new HttpException(403, "You do not have the proper right to update this user.");
+        }
+
+        //create temporary folder
+        if (!is_dir('uploads/avatar')) {
+            mkdir('uploads/avatar', 0777, true);
+        }
+
+        //check if the name already exist
+        $newName = uniqid().'.'.$uploadedFile->guessExtension();
+        while ($em->getRepository('AppBundle:User')->findOneBy(array("pathAvatar" => '/avatar/'.$newName)) != null) {
+            $newName = uniqid().'.'.$uploadedFile->guessExtension();
+        }
+
+        //save a temporary file
+        $uploadedFile->move('uploads/avatar/', $newName);
+
+        // upload on ftp
+        $ftpService = $this->get('app.ftp_connect');
+        $path = $ftpService->uploadFtpImage($newName, "avatar/");
+
+        //delete temporary
+        unlink('uploads/avatar/'.$newName);
+
+        //delete old on ftp
+        if ($user->getPathAvatar() != null) {
+            $ftpService->deleteFtpImage($user->getPathAvatar());
+        }
+
+        //add new information
+        $user->setPathAvatar($path);
         $em->persist($user);
         $em->flush();
 
