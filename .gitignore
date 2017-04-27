@@ -20,3 +20,7 @@ composer\.phar
 composer\.lock
 
 \.idea/
+
+web/uploads/
+
+web/
