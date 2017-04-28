@@ -65,8 +65,6 @@ class AuthController extends FOSRestController
         return new JsonResponse(['token' => $token, 'idUser' => $user->getId()]);
     }
 
-    //todo only anonymous
-
     /**
      * Send a mail providing a token to recover a forgotten password.
      *

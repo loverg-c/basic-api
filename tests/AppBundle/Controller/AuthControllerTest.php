@@ -102,5 +102,6 @@ class AuthControllerTest extends TestCase
         );
     }
 
+    // TODO test for recoverpassword and change password
 
 }

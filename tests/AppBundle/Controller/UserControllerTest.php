@@ -864,4 +864,6 @@ class UserControllerTest extends TestCase
         );
     }
 
+    // TODO test for avatar
+
 }
