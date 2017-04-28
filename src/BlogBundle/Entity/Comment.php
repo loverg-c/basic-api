@@ -64,12 +64,19 @@ class Comment
     private $article;
 
     /**
-     * @var Comment
-     *
-     * @ORM\ManyToOne(targetEntity="BlogBundle\Entity\Comment")
-     * @ORM\JoinColumn(name="parent_comment_id", referencedColumnName="id", nullable=true)
+     * @var Comment[]
+     * One Comment has Many Comments.
+     * @ORM\OneToMany(targetEntity="BlogBundle\Entity\Comment", mappedBy="parent")
      */
-    private $parentComment;
+    private $childrens;
+
+    /**
+     * @var Comment
+     * Many Comments have One Comment.
+     * @ORM\ManyToOne(targetEntity="BlogBundle\Entity\Comment", inversedBy="childrens",  cascade={"persist", "remove"})
+     * @ORM\JoinColumn(name="parent_id", referencedColumnName="id", nullable=true, onDelete="SET NULL")
+     */
+    private $parent;
 
     /**
      * @var User[]
@@ -88,6 +95,7 @@ class Comment
     public function __construct()
     {
         $this->likes = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->childrens = new \Doctrine\Common\Collections\ArrayCollection();
     }
 
     /**
@@ -165,19 +173,52 @@ class Comment
     }
 
     /**
-     * @return Comment
+     * @return Comment[]
      */
-    public function getParentComment()
+    public function getChildrens()
     {
-        return $this->parentComment;
+        return $this->childrens;
     }
 
     /**
-     * @param Comment $parentComment
+     * @param Comment[] $childrens
      */
-    public function setParentComment($parentComment)
+    public function setChildrens($childrens)
     {
-        $this->parentComment = $parentComment;
+        $this->childrens = $childrens;
+    }
+
+    /**
+     * @param Comment $comment
+     */
+    public function addChildren(Comment $comment)
+    {
+        $this->childrens->add($comment);
+    }
+
+    /**
+     * @param Comment $comment
+     */
+    public function removeChildren(Comment $comment)
+    {
+        $this->childrens->removeElement($comment);
+    }
+
+    /**
+     * @return Comment
+     */
+    public function getParent()
+    {
+        return $this->parent;
+    }
+
+    /**
+     * @param Comment $parent
+     */
+    public function setParent(Comment $parent)
+    {
+        $this->parent = $parent;
+        $parent->addChildren($this);
     }
 
     /**
@@ -210,6 +251,14 @@ class Comment
     public function removeLike(User $user)
     {
         $this->likes->removeElement($user);
+    }
+
+    /**
+     * Erase auhtor sensitive data
+     */
+    public function eraseAuthorSensitive()
+    {
+        $this->author->eraseSensitive();
     }
 }
 

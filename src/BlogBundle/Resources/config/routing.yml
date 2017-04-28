@@ -1,0 +1,3 @@
+article:
+    type:        rest
+    resource:    BlogBundle\Controller\ArticleController

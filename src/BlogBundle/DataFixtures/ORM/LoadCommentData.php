@@ -46,6 +46,7 @@ class LoadCommentData extends AbstractFixture implements FixtureInterface, Conta
         $commentchild->setAuthor($ileoadmin);
         $commentchild->addLike($ileouser);
         $commentchild->setArticle($article);
+        $commentchild->setParent($comment);
 
 
         $manager->persist($comment);

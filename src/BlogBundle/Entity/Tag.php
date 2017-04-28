@@ -32,21 +32,6 @@ class Tag
      */
     private $title;
 
-    /**
-     * @var Article[]
-     *
-     * Many Groups have Many Users.
-     * @ORM\ManyToMany(targetEntity="BlogBundle\Entity\Article", mappedBy="tags")
-     */
-    private $articles;
-
-    /**
-     * Tag constructor.
-     */
-    public function __construct()
-    {
-        $this->articles = new \Doctrine\Common\Collections\ArrayCollection();
-    }
 
     /**
      * Get id
@@ -74,37 +59,6 @@ class Tag
         $this->title = $title;
     }
 
-    /**
-     * @return Article[]|ArrayCollection
-     */
-    public function getArticles()
-    {
-        return $this->articles;
-    }
-
-    /**
-     * @param Article[] $articles
-     */
-    public function setArticles($articles)
-    {
-        $this->articles = $articles;
-    }
-
-    /**
-     * @param Article $article
-     */
-    public function addArticle(Article $article)
-    {
-        $this->articles->add($article);
-    }
-
-    /**
-     * @param Article $article
-     */
-    public function removeArticle(Article $article)
-    {
-        $this->articles->removeElement($article);
-    }
 
 }
 

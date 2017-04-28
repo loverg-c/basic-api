@@ -212,7 +212,6 @@ class Article
      */
     public function addTag(Tag $tag)
     {
-        $tag->addArticle($this);
         $this->tags->add($tag);
     }
 
@@ -221,7 +220,6 @@ class Article
      */
     public function removeTag(Tag $tag)
     {
-        $tag->removeArticle($this);
         $this->tags->removeElement($tag);
     }
 
@@ -256,6 +254,17 @@ class Article
     {
         $this->likes->removeElement($user);
     }
-    
+
+    /**
+     * Erase auhtor sensitive data
+     */
+    public function eraseAuthorSensitive()
+    {
+        $this->author->eraseSensitive();
+        foreach ($this->likes as $like) {
+            $like->eraseSensitive();
+        }
+    }
+
 }
 
