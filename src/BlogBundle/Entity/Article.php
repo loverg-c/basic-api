@@ -66,7 +66,7 @@ class Article
      * @var Category
      *
      * @ORM\ManyToOne(targetEntity="BlogBundle\Entity\Category")
-     * @ORM\JoinColumn(name="category_id", referencedColumnName="id", nullable=true)
+     * @ORM\JoinColumn(name="category_id", referencedColumnName="id", nullable=false)
      */
     private $category;
 
@@ -76,7 +76,7 @@ class Article
      * @ORM\ManyToMany(targetEntity="BlogBundle\Entity\Tag", inversedBy="articles")
      * @ORM\JoinTable(name="article_tag",
      *      joinColumns={@ORM\JoinColumn(name="article_id", referencedColumnName="id")},
-     *      inverseJoinColumns={@ORM\JoinColumn(name="tag_id", referencedColumnName="id", unique=true)}
+     *      inverseJoinColumns={@ORM\JoinColumn(name="tag_id", referencedColumnName="id")}
      *      )
      */
     private $tags;

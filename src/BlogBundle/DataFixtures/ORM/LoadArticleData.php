@@ -55,8 +55,9 @@ class LoadArticleData extends AbstractFixture implements FixtureInterface, Conta
         $article->addTag($rock);
         $article->addLike($ileouser);
         $article->setCategory($musique);
-        $article->setContent(htmlspecialchars(
-            "<div class=\"entry\">
+        $article->setContent(
+            htmlspecialchars(
+                "<div class=\"entry\">
 				<p>
 				    <strong>ULTRA VOMIT</strong> dévoile les premiers détails de son nouvel album, intitulé Panzer Surprise, prévu le 28 avril chez Verycords.
 				    <span id=\"more-251927\"></span>
@@ -73,7 +74,8 @@ class LoadArticleData extends AbstractFixture implements FixtureInterface, Conta
                         class=\"aligncenter size-full wp-image-251929\"
                         sizes=\"(max-width: 960px) 100vw, 960px\" height=\"500\">
                 </p>
-            ")
+            "
+            )
         );
         $manager->persist($metal);
         $manager->persist($humour);

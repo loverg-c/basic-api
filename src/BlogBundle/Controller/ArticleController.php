@@ -3,6 +3,7 @@
 
 namespace BlogBundle\Controller;
 
+use BlogBundle\Form\ArticleType;
 use FOS\RestBundle\Controller\Annotations\Patch;
 use FOS\RestBundle\Controller\FOSRestController;
 use FOS\RestBundle\Controller\Annotations\Post;
@@ -27,7 +28,7 @@ class ArticleController extends FOSRestController
 {
 
     /**
-     * Return a article by id.
+     * Return an article by id.
      *
      * @Get("/articles/{id}")
      *
@@ -84,91 +85,71 @@ class ArticleController extends FOSRestController
     }
 
     /**
-     * Create a article.
+     * Create an article.
      *
      * @Post("/articles")
+     *
+     * @Security("is_granted('ROLE_ADMIN')")
      *
      * @ApiDoc(
      *  resource = "Article",
      *  description = "Creates a new article",
      *  parameters = {
      *
-     *      { "name"="articlename", "dataType"="string", "required"=true, "format"="", "description"="Articlename" },
-     *      { "name"="email", "dataType"="string", "required"=true, "format"="", "description"="Email" },
-     *      { "name"="password", "dataType"="string", "required"=true, "format"="", "description"="Plain Password" }
+     *      { "name"="title", "dataType"="string", "required"=true, "format"="", "description"="Title" },
+     *      { "name"="content", "dataType"="string", "required"=true, "format"="", "description"="Content" },
+     *      { "name"="category", "dataType"="integer", "required"=true, "format"="", "description"="Category" },
+     *      { "name"="tags", "dataType"="string[]", "required"=false, "format"="", "description"="Tags" }
      *  },
      *  statusCodes = {
      *      200 = "Returned when successful",
      *      400 = "Returned when a/some parameter(s) is/are invalid",
      *      403 = "Returned when the request is forbidden",
-     *      409 = "Returned when the email or articlename is already used"
+     *      404 = "Returned when a category is not found"
      *  }
      * )
      *
      * @param ParamFetcher $paramFetcher
      *
-     * @RequestParam(name="articlename", nullable=false, strict=true, description="Articlename")
-     * @RequestParam(name="email", nullable=false, strict=true, description="Email")
-     * @RequestParam(name="password", nullable=false, strict=true, description="Plain Password")
+     * @RequestParam(name="title", nullable=false, strict=true, description="Title")
+     * @RequestParam(name="content", nullable=false, strict=true, description="Content")
+     * @RequestParam(name="category", nullable=false, strict=true, description="Category")
+     * @RequestParam(name="tags", nullable=true, strict=true, description="Tags (array of tags, or string) if one not exist, it will be created")
      *
      * @return Response
      */
-//    public function postArticleAction(ParamFetcher $paramFetcher)
-//    {
-//        $em = $this->getDoctrine()->getManager();
-//        $params = $paramFetcher->all();
-//
-//
-//        if (preg_match('/\s/', $params["articlename"])) {
-//            throw new HttpException(400, "The articlename contains space(s)");
-//        }
-//
-//        if (preg_match('/\s/', $params["password"])) {
-//            throw new HttpException(400, "The password contains space(s)");
-//        }
-//
-//
-//        //check doublon
-//        $res = $em->getRepository("AppBundle:Article")->findOneBy(["email" => $params["email"]]);
-//        if ($res) {
-//            throw new HttpException(409, "This email already exists.");
-//        }
-//        $res = $em->getRepository("AppBundle:Article")->findOneBy(["articlename" => $params["articlename"]]);
-//        if ($res) {
-//            throw new HttpException(409, "This articlename already exists.");
-//        }
-//
-//
-//        $article = new Article();
-//
-//        //encodage password
-//        $params["salt"] = bin2hex(random_bytes(255));
-//        $encoder = $this->get("security.password_encoder");
-//        $encoded = $encoder->encodePassword($article, $params["password"]);
-//        $params["password"] = $encoded;
-//
-//        $params['role'] = 'ROLE_ARTICLE';
-//
-//        if (isset($params["id"])) {
-//            unset($params["id"]);
-//        }
-//
-//        $form = $this->createForm(ArticleType::class, $article);
-//        //verification validité
-//        $form->submit($params);
-//
-//        if ($form->isValid() == false) {
-//            return $this->handleView(View::create()->setData($form->getErrors())->setStatusCode(400));
-//        }
-//
-//        //push bdd
-//        $em->persist($article);
-//        $em->flush();
-//
-//        $article->eraseSensitive();
-//
-//        return $this->handleView(View::create()->setData($article)->setStatusCode(200));
-//    }
+    public function postArticleAction(ParamFetcher $paramFetcher)
+    {
+        $em = $this->getDoctrine()->getManager();
+        $params = $paramFetcher->all();
+
+        if (isset($params["tags"]) && !is_array($params["tags"])) {
+            throw new HttpException(400, "Tags should be array of tags object or at least array of string");
+        }
+        if (($category = $em->getRepository("BlogBundle:Category")->find($params["category"])) == null) {
+            throw new HttpException(404, "This category does not exist.");
+        }
+        $params['author'] = $this->getUser()->getId();
+        $params["tags"] = $em->getRepository('BlogBundle:Tag')->findAllOrCreate($params['tags']);
+
+        $article = new Article();
+        $article->setCreatedAt((new \DateTime()));
+        $form = $this->createForm(ArticleType::class, $article);
+        //verification validité
+        $form->submit($params);
+
+        if ($form->isValid() == false) {
+            return $this->handleView(View::create()->setData($form->getErrors())->setStatusCode(400));
+        }
+
+        //push bdd
+        $em->persist($article);
+        $em->flush();
+
+        $article->getAuthor()->eraseSensitive();
+
+        return $this->handleView(View::create()->setData($article)->setStatusCode(200));
+    }
 
     /**
      * Replace old article by new article at ID.
