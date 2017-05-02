@@ -95,7 +95,6 @@ class ArticleController extends FOSRestController
      *  resource = "Article",
      *  description = "Creates a new article",
      *  parameters = {
-     *
      *      { "name"="title", "dataType"="string", "required"=true, "format"="", "description"="Title" },
      *      { "name"="content", "dataType"="string", "required"=true, "format"="", "description"="Content" },
      *      { "name"="category", "dataType"="integer", "required"=true, "format"="", "description"="Category" },
@@ -156,7 +155,7 @@ class ArticleController extends FOSRestController
      *
      * @Put("/articles/{id}")
      *
-     * @Security("is_granted('IS_AUTHENTICATED_FULLY')")
+     * @Security("is_granted('ROLE_ADMIN')")
      *
      * @ApiDoc(
      *  resource = "Article",
@@ -165,77 +164,64 @@ class ArticleController extends FOSRestController
      *      { "name" = "id", "dataType" = "int", "requirement" = "\d+", "description" = "Article id" }
      *  },
      *  parameters = {
-     *      { "name"="articlename", "dataType"="string", "required"=true, "format"="", "description"="Articlename" },
-     *      { "name"="email", "dataType"="string", "required"=true, "format"="", "description"="Email" },
-     *      { "name"="password", "dataType"="string", "required"=true, "format"="", "description"="Plain Password" }
+     *      { "name"="title", "dataType"="string", "required"=true, "format"="", "description"="Title" },
+     *      { "name"="content", "dataType"="string", "required"=true, "format"="", "description"="Content" },
+     *      { "name"="category", "dataType"="integer", "required"=true, "format"="", "description"="Category" },
+     *      { "name"="tags", "dataType"="string[]", "required"=false, "format"="", "description"="Tags" }
      *  },
      *  statusCodes = {
      *      200 = "Returned when successful",
      *      400 = "Returned when a/some parameter(s) is/are invalid",
      *      403 = "Returned when the request is forbidden",
-     *      409 = "Returned when the email or articlename is already used"
+     *      404 = "Returned when a category is not found"
      *  }
      * )
      *
-     * @RequestParam(name="articlename", nullable=false, strict=true, description="The articlename")
-     * @RequestParam(name="email", nullable=false, strict=true, description="The email")
-     * @RequestParam(name="password", nullable=false, strict=true, description="The password")
+     * @RequestParam(name="title", nullable=false, strict=true, description="Title")
+     * @RequestParam(name="content", nullable=false, strict=true, description="Content")
+     * @RequestParam(name="category", nullable=false, strict=true, description="Category")
+     * @RequestParam(name="tags", nullable=true, strict=true, description="Tags (array of tags, or string) if one not exist, it will be created")
      *
      * @param int $id
-     * @param ParamFetcher $paramfetcher
+     * @param ParamFetcher $paramFetcher
      * @return Response
      */
-//    public function putArticlesAction($id, ParamFetcher $paramfetcher)
-//    {
-//        $params = $paramfetcher->all();
-//        $em = $this->getDoctrine()->getManager();
-//        $article = $em->getRepository('AppBundle:Article')->find($id);
-//
-//        if (!$article) {
-//            throw new HttpException(404, "Article cannot be found.");
-//        }
-//        if ($id != $this->getArticle()->getId() && !$this->get('security.authorization_checker')->isGranted(
-//                'ROLE_ADMIN'
-//            )
-//        ) {
-//            throw new HttpException(403, "You do not have the proper right to update this article.");
-//        }
-//
-//        $res = $em->getRepository("AppBundle:Article")->findOneBy(["email" => $params["email"]]);
-//        if ($res && $res->getId() != $id) {
-//            throw new HttpException(409, "This email already exists.");
-//        }
-//
-//        $res = $em->getRepository("AppBundle:Article")->findOneBy(["articlename" => $params["articlename"]]);
-//        if ($res && $res->getId() != $id) {
-//            throw new HttpException(409, "This articlename already exists.");
-//        }
-//
-//        //encodage password
-//        $params["salt"] = bin2hex(random_bytes(255));
-//        $encoder = $this->get("security.password_encoder");
-//        $encoded = $encoder->encodePassword($article, $params["password"]);
-//        $params["password"] = $encoded;
-//        $params["role"] = "ROLE_ARTICLE";
-//
-//        if (isset($params["id"])) {
-//            unset($params["id"]);
-//        }
-//
-//        $form = $this->createForm(ArticleType::class, $article);
-//        $form->submit($params);
-//
-//        if ($form->isValid() == false) {
-//            throw new HttpException(400, $form->getErrors());
-//        }
-//
-//        $em->persist($article);
-//        $em->flush();
-//
-//        $article->eraseSensitive();
-//
-//        return $this->handleView(View::create()->setData($article)->setStatusCode(200));
-//    }
+    public function putArticlesAction($id, ParamFetcher $paramFetcher)
+    {
+        $em = $this->getDoctrine()->getManager();
+        $params = $paramFetcher->all();
+        $article = $em->getRepository('BlogBundle:Article')->find($id);
+
+        if (!$article) {
+            throw new HttpException(404, "Article cannot be found.");
+        }
+        if (isset($params["tags"]) && !is_array($params["tags"])) {
+            throw new HttpException(400, "Tags should be array of tags object or at least array of string");
+        }
+        if (($category = $em->getRepository("BlogBundle:Category")->find($params["category"])) == null) {
+            throw new HttpException(404, "This category does not exist.");
+        }
+        $params['author'] = $this->getUser()->getId();
+        $params["tags"] = $em->getRepository('BlogBundle:Tag')->findAllOrCreate($params['tags']);
+
+        $article->setCreatedAt((new \DateTime()));
+
+        $form = $this->createForm(ArticleType::class, $article);
+        //verification validité
+        $form->submit($params);
+
+        if ($form->isValid() == false) {
+            return $this->handleView(View::create()->setData($form->getErrors())->setStatusCode(400));
+        }
+
+        //push bdd
+        $em->persist($article);
+        $em->flush();
+
+        $article->getAuthor()->eraseSensitive();
+
+        return $this->handleView(View::create()->setData($article)->setStatusCode(200));
+    }
 
     /**
      * Update some data for a article.
