@@ -20,7 +20,7 @@ use BlogBundle\Entity\Article as Article;
 
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\HttpException;
-//use BlogBundle\Form\ArticleType;
+
 use FOS\RestBundle\Request\ParamFetcher;
 
 
@@ -284,6 +284,7 @@ class ArticleController extends FOSRestController
             $params["tags"] = $em->getRepository('BlogBundle:Tag')->findAllOrCreate($params['tags']);
         }
 
+        //todo find a better way for patch, and avoid not in form problem
 
         $articleAsArr = json_decode($this->get("custom_serializer")->serializeJson($article), true);
         foreach ($articleAsArr as $key => $p) {

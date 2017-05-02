@@ -1,6 +1,6 @@
 <?php
 
-namespace AppBundle\DataFixtures\ORM;
+namespace BlogBundle\DataFixtures\ORM;
 
 use AppBundle\Entity\User;
 use BlogBundle\Entity\Category;
