@@ -50,6 +50,43 @@ class ArticleControllerTest extends TestCase
     ];
 
     /**
+     * @var array
+     */
+    private $expected = [
+        "title" => "Sortie du nouvel album d\\'Ultra Vomit",
+        "content" => "&lt;div class=&quot;entry&quot;&gt;\n\t\t\t\t&lt;p&gt;\n\t\t\t\t    &lt;strong&gt;ULTRA VOMIT&lt;/strong&gt; dévoile les premiers détails de son nouvel album, intitulé Panzer Surprise, prévu le 28 avril chez Verycords.\n\t\t\t\t    &lt;span id=&quot;more-251927&quot;&gt;&lt;/span&gt;\n\t\t\t\t&lt;/p&gt;\n                &lt;p&gt;Teaser réalisé par Nicolas Leroy :&lt;/p&gt;\n                &lt;p&gt;&lt;/p&gt;\n                &lt;center&gt;\n                    &lt;iframe src=&quot;https://www.youtube.com/embed/geH49uzJooU&quot; allowfullscreen=&quot;&quot; height=&quot;315&quot; frameborder=&quot;0&quot; width=&quot;560&quot;&gt;&lt;/iframe&gt;\n                &lt;/center&gt;\n                &lt;p&gt;&lt;/p&gt;\n                &lt;p&gt;Artwork :&lt;/p&gt;\n                &lt;p&gt;\n                    &lt;img src=&quot;http://www.radiometal.com/wp-content/uploads/2017/03/17498539_10155131581851972_2622969336406760238_n.jpg&quot; alt=&quot;&quot;\n                        class=&quot;aligncenter size-full wp-image-251929&quot;\n                        sizes=&quot;(max-width: 960px) 100vw, 960px&quot; height=&quot;500&quot;&gt;\n                &lt;/p&gt;\n            ",
+        "author" => [
+            "username" => "ileo-admin",
+            "role" => "ROLE_SUPER_ADMIN",
+            "email" => "admin@ileotech.com",
+        ],
+        "category" => [
+            "title" => "musique",
+        ],
+        "tags" => [
+            [
+                "title" => "metal",
+            ],
+            [
+                "title" => "rock",
+            ],
+            [
+                "title" => "parodie",
+            ],
+            [
+                "title" => "humour",
+            ],
+        ],
+        "likes" => [
+            [
+                "username" => "ileo-user",
+                "role" => "ROLE_USER",
+                "email" => "user@ileotech.com",
+            ],
+        ],
+    ];
+
+    /**
      * Setup:
      * - load required fixtures
      * - fetch admin and article information: tokens and ids
@@ -140,42 +177,16 @@ class ArticleControllerTest extends TestCase
             ],
             null,
             [
-                [
-                    "title" => "Sortie du nouvel album d\\'Ultra Vomit",
-                    "content" => "&lt;div class=&quot;entry&quot;&gt;\n\t\t\t\t&lt;p&gt;\n\t\t\t\t    &lt;strong&gt;ULTRA VOMIT&lt;/strong&gt; dévoile les premiers détails de son nouvel album, intitulé Panzer Surprise, prévu le 28 avril chez Verycords.\n\t\t\t\t    &lt;span id=&quot;more-251927&quot;&gt;&lt;/span&gt;\n\t\t\t\t&lt;/p&gt;\n                &lt;p&gt;Teaser réalisé par Nicolas Leroy :&lt;/p&gt;\n                &lt;p&gt;&lt;/p&gt;\n                &lt;center&gt;\n                    &lt;iframe src=&quot;https://www.youtube.com/embed/geH49uzJooU&quot; allowfullscreen=&quot;&quot; height=&quot;315&quot; frameborder=&quot;0&quot; width=&quot;560&quot;&gt;&lt;/iframe&gt;\n                &lt;/center&gt;\n                &lt;p&gt;&lt;/p&gt;\n                &lt;p&gt;Artwork :&lt;/p&gt;\n                &lt;p&gt;\n                    &lt;img src=&quot;http://www.radiometal.com/wp-content/uploads/2017/03/17498539_10155131581851972_2622969336406760238_n.jpg&quot; alt=&quot;&quot;\n                        class=&quot;aligncenter size-full wp-image-251929&quot;\n                        sizes=&quot;(max-width: 960px) 100vw, 960px&quot; height=&quot;500&quot;&gt;\n                &lt;/p&gt;\n            ",
-                    "author" => [
-                        "username" => "ileo-admin",
-                        "role" => "ROLE_SUPER_ADMIN",
-                        "email" => "admin@ileotech.com",
-                    ],
-                    "category" => [
-                        "title" => "musique",
-                    ],
-                    "tags" => [
-                        [
-                            "title" => "metal",
-                        ],
-                        [
-                            "title" => "rock",
-                        ],
-                        [
-                            "title" => "parodie",
-                        ],
-                        [
-                            "title" => "humour",
-                        ],
-                    ],
-                    "likes" => [
-                        [
-                            "username" => "ileo-user",
-                            "role" => "ROLE_USER",
-                            "email" => "user@ileotech.com",
-                        ],
-                    ],
-
-                ],
+                $this->expected,
             ]
         );
     }
+
+
+    //todo test for get by id
+    //todo test for post
+    //todo test for put
+    //todo test for patch
+    //todo test for delete
 
 }
