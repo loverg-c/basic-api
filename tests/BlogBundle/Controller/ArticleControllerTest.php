@@ -41,13 +41,9 @@ class ArticleControllerTest extends TestCase
 
 
     /**
-     * New article
+     * First article
      */
-    private $article_data = [
-        "title" => "",
-        "category" => "",
-        "tags" => ["", "", ["title" => ""]],
-    ];
+    private $firstArticle = [];
 
     /**
      * @var array
@@ -127,6 +123,16 @@ class ArticleControllerTest extends TestCase
         $this->user["token"] = $response["token"];
         $this->user["id"] = $response["idUser"];
 
+        $listArticles = $this->httpRequest200(
+            [
+                "method" => "GET",
+                "path" => '/api/blog'.$this->endpoint,
+                "token" => $this->admin["token"],
+            ]
+        );
+
+        $this->firstArticle = $listArticles[0];
+
     }
 
 
@@ -184,9 +190,161 @@ class ArticleControllerTest extends TestCase
 
 
     //todo test for get by id
+
+    /**
+     * Get a article by id: GET /articles/:article_id
+     * Tests:
+     * - 200: successful
+     * - 401: token not provided
+     * - 404: token provided but invalid
+     * - 404: article cannot be found
+     */
+
+    /**
+     * @group getArticleById
+     */
+    public function testGetArticleById_401_tokenNotProvided()
+    {
+        $this->httpRequest401(["method" => "GET", "path" => '/api/blog'.$this->endpoint."/".$this->firstArticle['id']]);
+    }
+
+    /**
+     * @group getArticleById
+     */
+    public function testGetArticleById_404_invalidToken()
+    {
+        $this->httpRequest404(
+            [
+                "method" => "GET",
+                "path" => '/api/blog'.$this->endpoint."/".$this->firstArticle['id'],
+                "token" => substr($this->admin["token"], 0, -1),
+            ],
+            null,
+            ["code" => 404, "message" => "Not Found", "exception_message" => "User cannot be found."]
+        );
+    }
+
+    /**
+     * @group getArticleById
+     */
+    public function testGetArticleById_404_onArticle()
+    {
+        $this->httpRequest404(
+            ["method" => "GET", "path" => '/api/blog'.$this->endpoint."/0", "token" => $this->admin["token"]],
+            null,
+            ["code" => 404, "message" => "Not Found", "exception_message" => "Article cannot be found."]
+        );
+    }
+
+    /**
+     * @group getArticleById
+     */
+    public function testGetArticleById_200_successful()
+    {
+        $this->httpRequest200(
+            array(
+                "method" => "GET",
+                "path" => '/api/blog'.$this->endpoint."/".$this->firstArticle['id'],
+                "token" => $this->admin["token"],
+            ),
+            null,
+            $this->expected
+        );
+    }
+
+
+
     //todo test for post
     //todo test for put
     //todo test for patch
-    //todo test for delete
+
+
+
+    /**
+     * Delete a user : DELETE /articles/:article_id
+     * Tests:
+     * - 200: successful
+     * - 401: token not provided
+     * - 403: forbidden request when the token belongs to a user with no proper right to perform the request
+     * - 404: token provided but invalid
+     * - 404: article cannot be found
+     */
+
+    /**
+     * @group deleteArticle
+     */
+    public function testDeleteArticle_401_tokenNotProvided()
+    {
+        $this->httpRequest401(array("method" => "DELETE", "path" => '/api/blog'.$this->endpoint."/".$this->firstArticle["id"]));
+    }
+
+    /**
+     * @group deleteArticle
+     */
+    public function testDeleteArticle_403_forbidden()
+    {
+        $this->httpRequest403(
+            [
+                "method" => "DELETE",
+                "path" => '/api/blog'.$this->endpoint."/".$this->firstArticle["id"],
+                "token" => $this->user["token"],
+            ],
+            null,
+            ["code" => 403, "message" => "Forbidden"]
+        );
+    }
+
+    /**
+     * @group deleteArticle
+     */
+    public function testDeleteArticle_404_invalidToken()
+    {
+        $this->httpRequest404(
+            [
+                "method" => "DELETE",
+                "path" => '/api/blog'.$this->endpoint."/".$this->firstArticle["id"],
+                "token" => substr($this->admin["token"], 0, -1),
+            ],
+            null,
+            [
+                "code" => 404,
+                "message" => "Not Found",
+                "exception_message" => "User cannot be found.",
+
+            ]
+        );
+    }
+
+    /**
+     * @group deleteArticle
+     */
+    public function testDeleteArticle_404_onUser()
+    {
+        $this->httpRequest404(
+            ["method" => "DELETE", "path" => '/api/blog'.$this->endpoint."/0", "token" => $this->admin["token"]],
+            null,
+            ["code" => 404, "message" => "Not Found", "exception_message" => "Article cannot be found."]
+        );
+    }
+
+    /**
+     * @group deleteArticle
+     */
+    public function testDeleteArticle_200_successful()
+    {
+        $this->httpRequest200(
+            array(
+                "method" => "DELETE",
+                "path" => '/api/blog'.$this->endpoint."/".$this->firstArticle["id"],
+                "token" => $this->admin["token"],
+            ),
+            null,
+            [
+                "exception_message" => "Delete has been done, you will never see it again",
+            ]
+        );
+    }
+
+
 
 }
