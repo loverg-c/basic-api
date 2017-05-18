@@ -298,7 +298,7 @@ class ArticleController extends FOSRestController
                         }
                     }
                 } else {
-                        $params[$key] = $p;
+                    $params[$key] = $p;
                 }
             }
         }

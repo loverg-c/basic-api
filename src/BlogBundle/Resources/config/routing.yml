@@ -1,3 +1,7 @@
 article:
     type:        rest
     resource:    BlogBundle\Controller\ArticleController
+
+category:
+    type:        rest
+    resource:    BlogBundle\Controller\CategoryController

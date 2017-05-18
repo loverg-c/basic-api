@@ -5,10 +5,13 @@ namespace BlogBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+
 /**
  * Category
  *
  * @ORM\Table(name="category")
+ * @UniqueEntity("title")
  * @ORM\Entity(repositoryClass="BlogBundle\Repository\CategoryRepository")
  */
 class Category
@@ -27,7 +30,7 @@ class Category
      *
      * @Assert\NotNull()
      *
-     * @ORM\Column(name="title", type="string", length=255, nullable=false)
+     * @ORM\Column(name="title", type="string", length=255, nullable=false, unique=true)
      */
     private $title;
 
@@ -56,5 +59,6 @@ class Category
     {
         $this->title = $title;
     }
+
 }
 

@@ -2,6 +2,8 @@
 
 namespace BlogBundle\Repository;
 
+use BlogBundle\Entity\Category;
+
 /**
  * CategoryRepository
  *
@@ -10,4 +12,24 @@ namespace BlogBundle\Repository;
  */
 class CategoryRepository extends \Doctrine\ORM\EntityRepository
 {
+    /**
+     * @param string $title
+     * @return Category|null
+     */
+    public function fetchOneByTitleLow($title)
+    {
+
+
+        $query = $this->getEntityManager()->createQueryBuilder()
+            ->select('c')
+            ->from('BlogBundle:Category', 'c')
+            ->where('LOWER(c.title) LIKE LOWER(:title)')
+            ->setParameter('title', $title)
+            ->setMaxResults(1)
+            ->getQuery();
+
+        return ($query->getSingleResult());
+
+    }
+
 }

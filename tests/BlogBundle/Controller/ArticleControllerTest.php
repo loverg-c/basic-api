@@ -39,6 +39,54 @@ class ArticleControllerTest extends TestCase
         "token" => "",
     ];
 
+    /**
+     * @var array
+     */
+    private $new_article_data = [
+        "title" => "« Humanz » de Gorillaz : Albarn, plus invité que le maître d’œuvre",
+        "content" => "Le groupe virtuel fondé par le leader de Blur et Jamie Hewlett à la fin des années 1990 sort son cinquième album. Critique.<br>",
+        "category" => [
+            "title" => "musique",
+        ],
+        "tags" => [
+            [
+                "title" => "pop",
+            ],
+            [
+                "title" => "electronique",
+            ],
+            [
+                "title" => "trip hop",
+            ],
+        ],
+    ];
+
+    /**
+     * @var array
+     */
+    private $expected_new = [
+        "title" => "« Humanz » de Gorillaz : Albarn, plus invité que le maître d’œuvre",
+        "content" => "Le groupe virtuel fondé par le leader de Blur et Jamie Hewlett à la fin des années 1990 sort son cinquième album. Critique.<br>",
+        "author" => [
+            "username" => "ileo-admin",
+            "role" => "ROLE_SUPER_ADMIN",
+            "email" => "admin@ileotech.com",
+        ],
+        "category" => [
+            "title" => "musique",
+        ],
+        "tags" => [
+            [
+                "title" => "pop",
+            ],
+            [
+                "title" => "electronique",
+            ],
+            [
+                "title" => "trip hop",
+            ],
+        ],
+    ];
 
     /**
      * First article
@@ -132,7 +180,13 @@ class ArticleControllerTest extends TestCase
         );
 
         $this->firstArticle = $listArticles[0];
-
+        $this->new_article_data['category'] = $this->httpRequest200(
+            [
+                "method" => "GET",
+                "path" => '/api/blog/categories/title/'.$this->new_article_data['category']['title'],
+                "token" => $this->admin["token"],
+            ]
+        )['id'];
     }
 
 
@@ -187,9 +241,6 @@ class ArticleControllerTest extends TestCase
             ]
         );
     }
-
-
-    //todo test for get by id
 
     /**
      * Get a article by id: GET /articles/:article_id
@@ -253,11 +304,36 @@ class ArticleControllerTest extends TestCase
     }
 
 
-
+//$new_article_data
     //todo test for post
+
+
+    /**
+     * Post a article: POST /articles
+     * Tests:
+     * - 200: successfull
+     * - 409: email already exists
+     */
+
+
+    /**
+     * @group postArticle
+     */
+    public function testPostArticle_200_successful()
+    {
+
+        $this->httpRequest200(
+            ["method" => "POST", "path" => '/api/blog'.$this->endpoint, "token" => $this->admin["token"]],
+            $this->new_article_data,
+            $this->expected_new
+        );
+    }
+
+
+
+
     //todo test for put
     //todo test for patch
-
 
 
     /**
@@ -275,7 +351,9 @@ class ArticleControllerTest extends TestCase
      */
     public function testDeleteArticle_401_tokenNotProvided()
     {
-        $this->httpRequest401(array("method" => "DELETE", "path" => '/api/blog'.$this->endpoint."/".$this->firstArticle["id"]));
+        $this->httpRequest401(
+            array("method" => "DELETE", "path" => '/api/blog'.$this->endpoint."/".$this->firstArticle["id"])
+        );
     }
 
     /**
@@ -344,7 +422,6 @@ class ArticleControllerTest extends TestCase
             ]
         );
     }
-
 
 
 }
