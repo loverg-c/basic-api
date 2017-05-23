@@ -23,4 +23,11 @@ composer\.lock
 
 web/uploads/
 
-web/
+
+web/\.DS_Store
+
+web/apple-touch-icon\.png
+
+web/favicon\.ico
+
+web/robots\.txt
