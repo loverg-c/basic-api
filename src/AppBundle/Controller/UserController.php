@@ -183,7 +183,7 @@ class UserController extends FOSRestController
         $user = new User();
 
         //encodage password
-        $params["salt"] = bin2hex(random_bytes(255));
+        $params["salt"] = bin2hex(random_bytes(45));
         $encoder = $this->get("security.password_encoder");
         $encoded = $encoder->encodePassword($user, $params["password"]);
         $params["password"] = $encoded;
@@ -272,7 +272,7 @@ class UserController extends FOSRestController
         }
 
         //encodage password
-        $params["salt"] = bin2hex(random_bytes(255));
+        $params["salt"] = bin2hex(random_bytes(45));
         $encoder = $this->get("security.password_encoder");
         $encoded = $encoder->encodePassword($user, $params["password"]);
         $params["password"] = $encoded;
@@ -365,7 +365,7 @@ class UserController extends FOSRestController
         if (isset($params["password"])) {
 
             //encodage password
-            $params["salt"] = bin2hex(random_bytes(255));
+            $params["salt"] = bin2hex(random_bytes(45));
             $encoder = $this->get("security.password_encoder");
             $encoded = $encoder->encodePassword($user, $params["password"]);
             $params["password"] = $encoded;
