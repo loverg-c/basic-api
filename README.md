@@ -68,8 +68,8 @@ parameters:
     jwt_key_pass_phrase: basic-api
     jwt_token_ttl: 3600
     basic_api.ftp_path: 127.0.0.1       #ftp_info
-    basic_api.ftp_login: ileotech       #ftp_info
-    basic_api.ftp_password: d1zqvdzz    #ftp_info
+    basic_api.ftp_login: login       #ftp_info
+    basic_api.ftp_password: password    #ftp_info
 ```
 
 #### FTP server
